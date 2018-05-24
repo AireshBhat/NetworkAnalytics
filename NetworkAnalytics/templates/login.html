@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Login</title>
+{% endblock %}
+
+{% block body %}
+<style>
+    html{
+        width: 100%;
+        height: 100%;
+    }
+    body {
+        width: 100%;
+        height: 100%;
+    }
+    #main {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+    <div id="main" class="d-flex justify-content-center align-items-center">
+
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Login</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                <button type="submit" href="/admin_tools/">Login</button>
+              </form>
+            </div>
+        </div>
+
+        {% if user is False %}
+        <h2> Try again</h2>
+        {% endif %}
+
+    </div>
+{% endblock %}
+
+</html>
