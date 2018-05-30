@@ -24,6 +24,28 @@ Create graph-based analytics on the fly based on the csv/xlsx uploaded.
 | '/individualAnalytics/'       | Options to query a particular device in multiple ways to generate and download those graphs | 
 | '/comparativeAnalytics/'      | Add options to compare similar parameters and tabulate them |
 
+### UI Specs:
+
+#### Splash screen
+Lift an LVPEI logo and add some animation.
+
+#### Dashboard
+1. Navigation drawer with other endpoints
+2. Available devices on the server
+3. A link to last uploaded device
+
+#### Upload Data
+1. A field to upload files/ drag and drop the file. Add checks for the file name
+2. If confirmation received, reroute to '/individualAnalytics/' for that uploaded data
+
+#### Individual Analytics 
+1. Show a list of available devices 
+2. Upon selection, display an initial graphs and give graph options, and if any, download options in a split screen type i.e only half screen will be used for the display. The other half will have other general info and input parameters. 
+
+#### Comparative Analytics 
+1. Show a list of available devices
+2. Generate tabular data based on available parameters(mostly hardcoded params).
+
+
 ### TODO:
 1. Shell script to automatically set up the environment and install necessary packages
-2. Add a UI part in the README
