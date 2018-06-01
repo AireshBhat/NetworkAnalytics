@@ -46,6 +46,16 @@ Lift an LVPEI logo and add some animation.
 1. Show a list of available devices
 2. Generate tabular data based on available parameters(mostly hardcoded params).
 
+#### Timetable:
+
+##### UI:
+
+##### Backend:
+1. Filling db through xlsx/csv uploaded
+2. REST endpoints for dashboard
+3. List and number of available devices
+4. Give Device based data
+5. Specific analytics computation
 
 ### TODO:
 1. Shell script to automatically set up the environment and install necessary packages
