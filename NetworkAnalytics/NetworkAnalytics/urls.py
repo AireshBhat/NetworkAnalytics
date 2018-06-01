@@ -23,7 +23,5 @@ urlpatterns = [
     path('graphql', GraphQLView.as_view(graphiql=True)),
     path('zmyJkfZSpDBU8FL0iWZ9HkWpvoraWG9eFSfZd0g0JMvpD1IUxt6AwJfaRclVyg8O/authentication/',
          include('authentication.urls')),
-    path('', include('dashboard.urls')),
-    path('data/', include('data.urls')),
-    path('analytics/', include('analytics.urls')),
+    path('', include('analytics.urls')),
 ]

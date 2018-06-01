@@ -45,10 +45,8 @@ INSTALLED_APPS += [
 ]
 
 INSTALLED_APPS += [
+    'authentication.apps.AuthenticationConfig',
     'analytics.apps.AnalyticsConfig',
-    'dashboard.apps.DashboardConfig',
-    'data.apps.DataConfig',
-    'authentication.apps.AuthenticationConfig'
 ]
 
 MIDDLEWARE = [
