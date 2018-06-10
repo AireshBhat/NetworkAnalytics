@@ -1,4 +1,4 @@
 django
 djangorestframework
 pandas
-
+django-jet
