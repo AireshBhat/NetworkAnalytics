@@ -25,7 +25,7 @@ SECRET_KEY = '+xzadgufezy*2k8$_gce!+6e$px*4vf+i8xjm&746u7k&oen)7'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['nalvp.pythonanywhere.com']
 
 
 # Application definition
@@ -67,7 +67,7 @@ ROOT_URLCONF = 'NetworkAnalytics.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['NetworkAnalytics/NetworkAnalytics/templates', '../templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

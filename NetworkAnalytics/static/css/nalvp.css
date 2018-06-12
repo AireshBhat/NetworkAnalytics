@@ -1,0 +1,61 @@
+.box__uploading,
+.box__success,
+.box__error {
+  display: none;
+}
+
+.drag_drop {
+  display: -webkit-flex; /* Safari */
+  display: flex;
+  -webkit-flex-direction: column; /* Safari */
+  flex-direction:         column;
+  -webkit-justify-content: center; /* Safari */
+  justify-content:         center;
+  -webkit-align-items: center; /* Safari */
+  align-items:         center;
+}
+
+.box.has-advanced-upload {
+  background-color: white;
+  outline: 2px dashed black;
+  outline-offset: -10px;
+}
+.box.has-advanced-upload .box__dragndrop {
+  display: inline;
+}
+
+.box {
+  width: 70%;
+  height: 300px;
+  display: -webkit-flex; /* Safari */
+  display: flex;
+  -webkit-flex-direction: column; /* Safari */
+  flex-direction:         column;
+  -webkit-justify-content: center; /* Safari */
+  justify-content:         center;
+}
+
+.box__input {
+  display: -webkit-flex; /* Safari */
+  display: flex;
+  -webkit-flex-direction: column; /* Safari */
+  flex-direction:         column;
+  -webkit-justify-content: center; /* Safari */
+  justify-content:         center;
+  -webkit-align-items: center; /* Safari */
+  align-items:         center;
+  height: 100%;
+}
+
+.box__input > * {
+  padding: auto 0;
+  margin: 10px;
+}
+
+.box__button {
+    width: 10%;
+}
+
+.box.is-dragover {
+  background-color: grey;
+}

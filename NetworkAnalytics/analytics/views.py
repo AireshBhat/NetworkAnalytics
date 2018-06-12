@@ -1,7 +1,10 @@
 from django.shortcuts import render
-from django.http import JsonResponse, Http404
+from django.http import JsonResponse, Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from .forms import DataUploadForm
 from .models import *
@@ -12,32 +15,41 @@ from .constants import *
 import pandas as pd
 import json
 
-
+@csrf_exempt
+@api_view(['GET', 'POST'])
 def dashboard(request):
     if request.POST:
         device_count = Device.objects.count()
         last_upload = Device.objects.last()
         return JsonResponse({'device_count': device_count, 'last_upload': Device.objects.last()})
-    elif request.GET:
+    elif request.method == 'GET':
         return render(request, 'analytics/dashboard.html')
-    else:
-        return Http404
 
 
 @csrf_exempt
+@api_view(['GET', 'POST'])
 def upload_data(request):
-    if request.GET:
+    print("request")
+    if request.method == 'GET':
+        print("Upload darta given")
         return render(request, 'analytics/upload_data.html')
-    elif request.POST:
+    elif request.method == 'POST':
+        print('Request data')
+        print(request.data)
         if request.FILES is None:
-            return JsonResponse({'error': 'No Files Found in the request body'})
+            return JsonResponse({"error": "No Files Found in the request body"})
         else:
-            data = JSONParser().parse(request)
-            serializer = UploadSerializer(data=data)
+            """
+            data = JSONParser().parse(request.POST)
+            print("Data")
+            print(data)
+            """
+            serializer = UploadSerializer(data=request.POST)
             if serializer.is_valid():
                 uploaded_file = serializer.validated_data['uploaded_file']
                 override = serializer.validated_data['override']
                 uploaded_file_name = uploaded_file.name
+                print(uploaded_file_name)
                 if uploaded_file_name.endswith('.csv'):
                     if uploaded_file_name.count('_') == 2:
                         device_name = uploaded_file_name.split('_')[0]
@@ -88,12 +100,18 @@ def upload_data(request):
                                 device_exists_message = device_name + ' exists'
                                 return JsonResponse({'error': device_exists_message})
                     else:
+                        print("Inappropriate File Name")
                         return JsonResponse({'error': 'Inappropriate File Name Format'})
                 else:
+                    print("Inappropriate File Format")
                     return JsonResponse({'error': 'Inappropriate File Format'})
+            else:
+                print(serializer.errors)
+                return HttpResponse("Invalid serializers")
 
 
 @csrf_exempt
+@api_view(['GET', 'POST'])
 def individual_data(request):
     if request.GET:
         return render(request, 'analytics/individual_device.html')
@@ -105,6 +123,7 @@ def individual_data(request):
 
 
 @csrf_exempt
+@api_view(['GET', 'POST'])
 def device_list(request):
     if request.GET:
         devices_list = Device.objects.all()
@@ -115,6 +134,7 @@ def device_list(request):
 
 
 @csrf_exempt
+@api_view(['GET', 'POST'])
 def individual_analytics(request):
     if request.POST:
         data = request.Data
@@ -131,13 +151,15 @@ def individual_analytics(request):
                 total_up_time = compute_down_time(device_info)
                 ping_average = compute_average_ping(device_info)
                 packet_loss_average = compute_average_packet_loss(device_info)
-                return JsonResponse({'total_down_time': total_down_time, 'total_up_time': total_up_time,
-                                     'ping_average': ping_average, 'packet_loss_average': packet_loss_average})
-
+                return JsonResponse({'total_down_time': total_down_time,
+                                    'total_up_time': total_up_time,
+                                    'ping_average': ping_average,
+                                    'packet_loss_average': packet_loss_average})
         pass
     else:
         return Http404()
 
-
+@csrf_exempt
+@api_view(['GET', 'POST'])
 def comparative_analytics(request):
     pass

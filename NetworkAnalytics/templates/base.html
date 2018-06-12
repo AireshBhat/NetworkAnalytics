@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
-      integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
-      crossorigin="anonymous">
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
-        integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
-        crossorigin="anonymous"></script>
+
+<!-- This is the linking section -->
+<script   src="https://code.jquery.com/jquery-3.3.1.min.js"   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="   crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.1/css/materialize.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.1/js/materialize.js" type="text/javascript"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="../static/css/nalvp.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" type="text/javascript"></script>
+
+<!-- UIkit CSS -->
+<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />-->
+
+<!-- UIkit JS -->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>-->
+
+<script src="../static/node_modules/dropify/dist/js/dropify.js" type="text/javascript"></script>
+<link href="../static/node_modules/dropify/dist/css/dropify.css" rel="stylesheet" />
 
 <head>
     <meta charset="UTF-8">
@@ -22,17 +28,132 @@
 
 <body>
 
-    <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
-        <ul class="navbar-nav">
-            <li class="nav active ">
-              <a class="nav-link" href="/authentication/login/">LVPEI</a>
-            </li>
-        </ul>
+     <!-- This is the navbar component -->
+    <nav>
+        <div class="nav-wrapper grey darken-4">
+            <a href="#" data-target="slide-out" class="sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
+            <div class="brand-logo center grey darken-4">LVPEI Network Analytics</div>
+            <ul id="nav-mobile" class="left hide-on-med-and-down">
+            </ul>
+        </div>
     </nav>
+
+    <!-- This is the component for the side nav -->
+    <ul id="slide-out" class="sidenav">
+        <li>
+            <!--<div class="user-view">-->
+            <!--    <div class="background">-->
+            <!--        <img src="images/office.jpg">-->
+            <!--    </div>-->
+            <!--    <a href="#user"><img class="circle" src="images/yuna.jpg"></a>-->
+            <!--    <a href="#name"><span class="white-text name">John Doe</span></a>-->
+            <!--    <a href="#email"><span class="white-text email">jdandturk@gmail.com</span></a>-->
+            <!--</div>-->
+        </li>
+        <li><h>Menu</h></li>
+        <li><a href="#!"> Statistical </a></li>
+        <li><a href="#!"> Performance </a></li>
+        <li><a href="#!"> Previous Reports </a></li>
+        <li><a href="/rxukDcskAnhJMZN2nvuJSqajtcAh9Yd0XD9KmpWmt5rlMmF6xNbCEyktm6aXho2T/admin/"> Admin </a></li>
+        <li><div class="divider"></div></li>
+        <li><a class="subheader"> Reports </a></li>
+        <li><a class="waves-effect" href="#!"> This is where reports will go </a></li>
+    </ul>
+
+    <!-- This is the upload file component -->
+    <!--<div class="drag_drop">-->
+    <!--    <form class="box" method="post" action="" enctype="multipart/form-data">-->
+    <!--        <div class="box__input">-->
+    <!--            <input class="box__file" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />-->
+    <!--            <label for="file"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.</label>-->
+    <!--            <button class="box__button" type="submit">Upload</button>-->
+    <!--        </div>-->
+    <!--        <div>-->
+    <!--            <div class="box__uploading">Uploading&hellip;</div>-->
+    <!--            <div class="box__success">Done!</div>-->
+    <!--            <div class="box__error">Error! <span></span>.</div>-->
+    <!--        </div>-->
+    <!--    </form>-->
+    <!--</div>-->
+
+    <!--<div class="js-upload uk-placeholder uk-text-center">-->
+    <!--    <span uk-icon="icon: cloud-upload"></span>-->
+    <!--    <span class="uk-text-middle">Attach binaries by dropping them here or</span>-->
+    <!--    <div uk-form-custom>-->
+    <!--        <input type="file" multiple>-->
+    <!--        <span class="uk-link">selecting one</span>-->
+    <!--    </div>-->
+    <!--</div>-->
+
+    <!--<progress id="js-progressbar" class="uk-progress" value="0" max="100" hidden></progress>-->
+
 
     {% block body %}
 
     {% endblock %}
 
 </body>
+
+<!--<script>-->
+<!--    var bar = document.getElementById('js-progressbar');-->
+
+<!--    UIkit.upload('.js-upload', {-->
+
+<!--        url: '/uploadData/',-->
+<!--        multiple: true,-->
+
+<!--        beforeSend: function () {-->
+<!--            console.log('beforeSend', arguments);-->
+<!--        },-->
+<!--        beforeAll: function () {-->
+<!--            console.log('beforeAll', arguments);-->
+<!--        },-->
+<!--        load: function () {-->
+<!--            console.log('load', arguments);-->
+<!--        },-->
+<!--        error: function () {-->
+<!--            console.log('error', arguments);-->
+<!--        },-->
+<!--        complete: function () {-->
+<!--            console.log('complete', arguments);-->
+<!--        },-->
+
+<!--        loadStart: function (e) {-->
+<!--            console.log('loadStart', arguments);-->
+
+<!--            bar.removeAttribute('hidden');-->
+<!--            bar.max = e.total;-->
+<!--            bar.value = e.loaded;-->
+<!--        },-->
+
+<!--        progress: function (e) {-->
+<!--            console.log('progress', arguments);-->
+
+<!--            bar.max = e.total;-->
+<!--            bar.value = e.loaded;-->
+<!--        },-->
+
+<!--        loadEnd: function (e) {-->
+<!--            console.log('loadEnd', arguments);-->
+
+<!--            bar.max = e.total;-->
+<!--            bar.value = e.loaded;-->
+<!--        },-->
+
+<!--        completeAll: function () {-->
+<!--            console.log('completeAll', arguments);-->
+
+<!--            setTimeout(function () {-->
+<!--                bar.setAttribute('hidden', 'hidden');-->
+<!--            }, 1000);-->
+
+<!--            alert('Upload Completed');-->
+<!--        }-->
+
+<!--    });-->
+
+
+<!--</script>-->
+<script src="../static/js/nalvp.js" type="text/javascript"></script>
+
 </html>
