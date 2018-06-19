@@ -19,6 +19,8 @@
 <script src="../static/node_modules/dropify/dist/js/dropify.js" type="text/javascript"></script>
 <link href="../static/node_modules/dropify/dist/css/dropify.css" rel="stylesheet" />
 
+<script src="../static/node_modules/chart.js/dist/Chart.bundle.min.js" type="text/javascript"></script>
+
 <head>
     <meta charset="UTF-8">
     {% block title %}
@@ -51,7 +53,7 @@
             <!--</div>-->
         </li>
         <li><h>Menu</h></li>
-        <li><a href="#!"> Statistical </a></li>
+        <li><a href="/individualAnalytics/"> Statistical </a></li>
         <li><a href="#!"> Performance </a></li>
         <li><a href="#!"> Previous Reports </a></li>
         <li><a href="/rxukDcskAnhJMZN2nvuJSqajtcAh9Yd0XD9KmpWmt5rlMmF6xNbCEyktm6aXho2T/admin/"> Admin </a></li>
@@ -61,32 +63,10 @@
     </ul>
 
     <!-- This is the upload file component -->
-    <!--<div class="drag_drop">-->
-    <!--    <form class="box" method="post" action="" enctype="multipart/form-data">-->
-    <!--        <div class="box__input">-->
-    <!--            <input class="box__file" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />-->
-    <!--            <label for="file"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.</label>-->
-    <!--            <button class="box__button" type="submit">Upload</button>-->
-    <!--        </div>-->
-    <!--        <div>-->
-    <!--            <div class="box__uploading">Uploading&hellip;</div>-->
-    <!--            <div class="box__success">Done!</div>-->
-    <!--            <div class="box__error">Error! <span></span>.</div>-->
-    <!--        </div>-->
-    <!--    </form>-->
-    <!--</div>-->
-
-    <!--<div class="js-upload uk-placeholder uk-text-center">-->
-    <!--    <span uk-icon="icon: cloud-upload"></span>-->
-    <!--    <span class="uk-text-middle">Attach binaries by dropping them here or</span>-->
-    <!--    <div uk-form-custom>-->
-    <!--        <input type="file" multiple>-->
-    <!--        <span class="uk-link">selecting one</span>-->
-    <!--    </div>-->
-    <!--</div>-->
-
-    <!--<progress id="js-progressbar" class="uk-progress" value="0" max="100" hidden></progress>-->
-
+    <form id="file-form" class="file_upload">
+        <input type="file" id="file-select" class="dropify" name="uploaded_file" multiple/>
+        <button class="upload_button" id="upload-button" type="submit">Upload</button>
+    </form>
 
     {% block body %}
 
@@ -94,66 +74,150 @@
 
 </body>
 
-<!--<script>-->
-<!--    var bar = document.getElementById('js-progressbar');-->
+<script>
 
-<!--    UIkit.upload('.js-upload', {-->
+    var form = document.getElementById('file-form');
+    var fileSelect = document.getElementById('file-select');
+    var uploadButton = document.getElementById('upload-button');
 
-<!--        url: '/uploadData/',-->
-<!--        multiple: true,-->
+    $('form.file_upload').on('submit', function () {
+        // The following line is to prevent the html submit button from executing its function
+        event.preventDefault();
 
-<!--        beforeSend: function () {-->
-<!--            console.log('beforeSend', arguments);-->
-<!--        },-->
-<!--        beforeAll: function () {-->
-<!--            console.log('beforeAll', arguments);-->
-<!--        },-->
-<!--        load: function () {-->
-<!--            console.log('load', arguments);-->
-<!--        },-->
-<!--        error: function () {-->
-<!--            console.log('error', arguments);-->
-<!--        },-->
-<!--        complete: function () {-->
-<!--            console.log('complete', arguments);-->
-<!--        },-->
+        // Update button text.
+        uploadButton.innerHTML = 'Uploading...';
 
-<!--        loadStart: function (e) {-->
-<!--            console.log('loadStart', arguments);-->
+        var files = fileSelect.files;
 
-<!--            bar.removeAttribute('hidden');-->
-<!--            bar.max = e.total;-->
-<!--            bar.value = e.loaded;-->
-<!--        },-->
+        // Create a new FormData object.
+        var formData = new FormData();
 
-<!--        progress: function (e) {-->
-<!--            console.log('progress', arguments);-->
+        formData.append('uploaded_file', files[0], files[0].name);
 
-<!--            bar.max = e.total;-->
-<!--            bar.value = e.loaded;-->
-<!--        },-->
+        $.ajax({
+            type: "POST",
+            url: '/uploadData/',
+            data: formData,
+            beforeSend: function(xhr, cashless) {
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie != '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = jQuery.trim(cookies[i]);
+                            // Does this cookie string begin with the name we want?
+                            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            },
+            contentType: false,
+            processData: false,
+            success: function(data, text, an_text) {
+                uploadButton.innerHTML = 'Upload';
+                console.log("Success");
+                console.log(data);
+                getData();
+            },
+            error: function(error) {
+                console.log(error);
+                console.log("Error");
+            }
+        });
+    })
 
-<!--        loadEnd: function (e) {-->
-<!--            console.log('loadEnd', arguments);-->
+    function getData() {
+        $.ajax({
+            type: "GET",
+            url: '/devices/',
+            beforeSend: function(xhr, cashless) {
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie != '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = jQuery.trim(cookies[i]);
+                            // Does this cookie string begin with the name we want?
+                            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            },
+            contentType: false,
+            dataType: 'json',
+            // processData: false,
+            success: function(data, text, an_text) {
+                console.log("This is the second request");
+                console.log("Success");
+                console.log(data);
+                console.log(typeof(data[0]));
+                console.log(data[0]);
+                console.log("Device name part 2");
+                console.log(data[0].device_name)
 
-<!--            bar.max = e.total;-->
-<!--            bar.value = e.loaded;-->
-<!--        },-->
+                const form_data = {
+                    "device_name": data[0].device_name
+                };
+                console.log("Form Data");
+                console.log(form_data);
 
-<!--        completeAll: function () {-->
-<!--            console.log('completeAll', arguments);-->
+                console.log(JSON.stringify(form_data));
 
-<!--            setTimeout(function () {-->
-<!--                bar.setAttribute('hidden', 'hidden');-->
-<!--            }, 1000);-->
+                $.ajax({
+                    type: "POST",
+                    url: '/individualAnalytics/',
+                    data: JSON.stringify(form_data),
+                    beforeSend: function(xhr, cashless) {
+                        function getCookie(name) {
+                            var cookieValue = null;
+                            if (document.cookie && document.cookie != '') {
+                                var cookies = document.cookie.split(';');
+                                for (var i = 0; i < cookies.length; i++) {
+                                    var cookie = jQuery.trim(cookies[i]);
+                                    // Does this cookie string begin with the name we want?
+                                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                        break;
+                                    }
+                                }
+                            }
+                            return cookieValue;
+                        }
+                        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                    },
+                    contentType: 'application/json',
+                    // dataType: false,
+                    // processData: false,
+                    success: function(data, text, an_text) {
+                        console.log("This is the second request");
+                        console.log("Success");
+                        console.log(data);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                        console.log("Error");
+                    }
+                });
 
-<!--            alert('Upload Completed');-->
-<!--        }-->
 
-<!--    });-->
-
-
-<!--</script>-->
+            },
+            error: function(error) {
+                console.log(error);
+                console.log("Error");
+            }
+        });
+    };
+</script>
 <script src="../static/js/nalvp.js" type="text/javascript"></script>
 
 </html>

@@ -1,4 +1,4 @@
 DEVICE_TYPES = [
-    'ROUTERS',
-    'SERVERS'
+    'ROUTER',
+    'SERVER'
 ]

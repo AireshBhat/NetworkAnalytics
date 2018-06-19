@@ -12,13 +12,12 @@ def time_to_seconds(time):
 
 
 def seconds_to_time(seconds):
-    mins = int(seconds/60)
-    hours = int(mins/60)
-    days = int(hours/24)
+    days = int(seconds % 86400)
+    hours = int((seconds - (days * 86400)) % 3600)
+    mins = int((seconds - (days * 86400) - (hours * 3600)) % 60)
     secs = seconds - 60*mins - 3600*hours - 86400*days
     time = str(days) + "d " + str(hours) + "h " + str(mins) + "m " + str(secs) + "s"
     return time
-
 
 def compute_down_time(device_params_list):
     average_time = 0
@@ -57,4 +56,9 @@ def compute_average_packet_loss(device_params_list):
     average_packet_loss = str(average_packet_loss)
     average_packet_loss += '%'
     return average_packet_loss
+
+
+def date_to_server_format(date):
+    d = datetime.datetime.strptime(date, "%d-%m-%Y")
+    return d.strftime("%Y-%m-%d")
 

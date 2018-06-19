@@ -5,7 +5,7 @@ from .models import *
 
 class UploadSerializer(serializers.Serializer):
     uploaded_file = serializers.FileField()
-    override = serializers.BooleanField(default=False)
+    # override = serializers.BooleanField(default=False)
 
     def create(self, validated_data):
         return DataUpload.objects.create(validated_data.get('uploaded_file'))
@@ -28,6 +28,20 @@ class DeviceSerializer(serializers.ModelSerializer):
         pass
 
 
+class DeviceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Parameters
+        fields = ('device_name', 'device_type', 'device_region', 'device_isp', 'event_start_time', 'event_start_date',
+                  'event_end_time', 'event_end_date', 'event_duration', 'event_state', 'event_state_type',
+                  'device_ping', 'device_packet_loss', 'device_rta', 'device_checkout_time')
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
+
 class DeviceListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Device
@@ -38,6 +52,11 @@ class DeviceListSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         pass
+
+
+class DashboardSerializer(serializers.Serializer):
+    device_count = serializers.IntegerField(default=0)
+    last_upload = serializers.CharField(default="")
 
 
 class DeviceAnalysisSerializers(serializers.Serializer):
