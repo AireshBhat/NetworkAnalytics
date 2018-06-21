@@ -28,7 +28,7 @@ def dashboard(request):
         return HttpResponse(jsonpickle.encode({"device_count": device_count,
         "last_upload": last_upload}), content_type = 'application/json')
     elif request.method == 'GET':
-        return render(request, 'analytics/dashboard.html')
+        return render(request, 'public/index.html')
 
 
 @csrf_exempt
@@ -76,6 +76,7 @@ def upload_data(request):
                                         break
                                 device = Device(device_name=device_name, device_type=device_type,
                                                 device_region=device_region, device_isp=device_isp)
+                                print("Device Saved")
                                 device.save()
                                 file_location = '/home/nalvp' + settings.STATIC_URL + uploaded_file_name
                                 df = pd.read_csv(file_location)
@@ -83,10 +84,10 @@ def upload_data(request):
                                     try:
                                         print(d)
                                         event_start_time = d[1].split(' ')[1]
-                                        event_start_date = d[1].split(' ')[0]
-                                        event_end_date = d[2].split(' ')[0]
+                                        event_start_date = d[1].split(' ')[0].replace("/", "-")
+                                        event_end_date = d[2].split(' ')[0].replace("/", "-")
                                         event_end_time = d[2].split(' ')[1]
-                                        event_duration = d[3]
+                                        event_duration = d[3].strip("+")
                                         event_state = d[4].split(' ')[1]
                                         event_state_type = d[4].split(' ')[2].strip('()')
                                         if d[5].find("CRITICAL") != -1:
@@ -96,9 +97,9 @@ def upload_data(request):
                                             device_checkout_time = ""
                                         elif d[5].find('out') == -1:
                                             device_ping = d[5].split(' ')[1]
-                                            device_packet_loss = d[5].split(' ')[6].replace(",", "")
+                                            device_packet_loss = d[5].split(' ')[6].replace("%,", "")
                                             try:
-                                                device_rta = d[5].split(' ')[9] + d[5].split(' ')[10]
+                                                device_rta = d[5].split(' ')[9]
                                             except Exception as e:
                                                 device_rta = ""
                                             device_checkout_time = ""
@@ -106,7 +107,7 @@ def upload_data(request):
                                             device_ping = ""
                                             device_packet_loss = ""
                                             device_rta = ""
-                                            device_checkout_time = d[5].split('Host check timed out after')[1].replace(")", "")
+                                            device_checkout_time = d[5].split('Host check timed out after ')[1].replace(" seconds)", "")
                                         device_parameters = DeviceParameters.objects.create()
                                         device_parameters.device_name = device_name
                                         device_parameters.device_type = device_type
@@ -124,27 +125,47 @@ def upload_data(request):
                                         device_parameters.device_rta = device_rta
                                         device_parameters.device_checkout_time = device_checkout_time
                                         device_parameters.save()
-                                        paramters = Parameters()
-                                        paramters.device_name = device.device_name
-                                        paramters.device_type = device.device_type
-                                        paramters.device_region = device.device_region
-                                        paramters.device_isp = device.device_isp
-                                        paramters.event_start_time = event_start_time
-                                        paramters.event_start_date = date_to_server_format(event_start_date)
-                                        paramters.event_end_time = event_end_time
-                                        paramters.event_end_date = date_to_server_format(event_end_date)
-                                        paramters.event_duration = time_to_seconds(event_duration)
-                                        paramters.event_state = event_state
-                                        paramters.event_state_type = event_state_type
-                                        paramters.device_ping = device_ping
-                                        paramters.device_packet_loss = int(device_packet_loss.replace("%", ""))
-                                        paramters.device_rta = float(device_rta.replace(" ms", ""))
-                                        paramters.device_checkout_time = int(device_checkout_time.replace(" seconds", ""))
-                                        paramters.save()
-                                        print(device_parameters.device_start_time)
+                                        print("Device parameters saved")
+                                        parameters = Parameters()
+                                        print("Parameters called")
+                                        parameters.device_name = device.device_name
+                                        print("Device name parameters() " + device_name)
+                                        parameters.device_type = device.device_type
+                                        parameters.device_region = device.device_region
+                                        parameters.device_isp = device.device_isp
+                                        parameters.event_start_time = event_start_time
+                                        parameters.event_start_date = date_to_server_format(event_start_date)
+                                        parameters.event_end_time = event_end_time
+                                        parameters.event_end_date = date_to_server_format(event_end_date)
+                                        print("Duration")
+                                        print(event_duration)
+                                        parameters.event_duration = time_to_seconds(event_duration)
+                                        print(parameters.event_duration)
+                                        parameters.event_state = event_state
+                                        parameters.event_state_type = event_state_type
+                                        parameters.device_ping = device_ping
+                                        print(device_packet_loss)
+                                        print(device_rta)
+                                        print(device_checkout_time)
+                                        if device_packet_loss is not "":
+                                            parameters.device_packet_loss = int(device_packet_loss)
+                                        else:
+                                            parameters.device_packet_loss = 0
+                                        if device_rta is not "":
+                                            parameters.device_rta = float(device_rta)
+                                        else:
+                                            parameters.device_rta = 0.0
+                                        if device_checkout_time is not "":
+                                            parameters.device_checkout_time = float(device_checkout_time.replace(" seconds", ""))
+                                        else:
+                                            parameters.device_checkout_time = 0.0
+                                        parameters.save()
+                                        print("Parameters saved")
                                     except Exception as e:
+                                        print("saving exception")
+                                        print(e)
                                         pass
-                                return JsonResponse({'status': 'ok'})
+                                return JsonResponse(json.dumps({'status': 'ok'}), safe=False)
                             else:
                                 device_exists_message = device_name + ' exists'
                                 return JsonResponse({'error': device_exists_message})
@@ -174,8 +195,8 @@ def individual_data(request):
             return JsonResponse(json.dumps({'error': 'No Device Name found'}), safe=False)
         else:
             print(device_name)
-            device_info = DeviceParameters.objects.filter(device_name=device_name)
-            device_serializer = DeviceSerializer(data=device_info, many=True)
+            device_info = Parameters.objects.filter(device_name=device_name)
+            device_serializer = DeviceParametersSerializer(data=device_info, many=True)
             if device_serializer.is_valid():
                 return JsonResponse(device_serializer.data, safe=False)
             else:
@@ -204,19 +225,30 @@ def individual_analytics(request):
         device_name = data['device_name']
         print("Inside individual analytics")
         if device_name is None:
-            return JsonResponse(json.dumps({'error': 'No Device Name found'}))
+            return HttpResponse(json.dumps({'error': 'No Device Name found'}), content_type="application/json")
         else:
             print(device_name)
-            device_info = DeviceParameters.objects.get(device_name=device_name)
+            device_info = Parameters.objects.filter(device_name=device_name)
             if device_info is None:
-                return JsonResponse(json.dumps({'error': 'No Device found'}))
+                return HttpResponse(json.dumps({'error': 'No Device found'}), content_type="application/json")
             else:
+                try:
+                    search_filter_date_start = data['start_date']
+                    device_info = device_info.filter(event_start_date__gte=search_filter_date_start)
+                except KeyError as ke:
+                    try:
+                        search_filter_date_end = data['end_date']
+                        device_info = device_info.filter(event_end_date__lte=search_filter_date_end)
+                    except KeyError as ke:
+                        pass
                 average_down_time = compute_down_time(device_info)
                 average_up_time = compute_up_time(device_info)
                 ping_average = compute_average_ping(device_info)
                 packet_loss_average = compute_average_packet_loss(device_info)
-                return JsonResponse(json.dumps({'average_down_time': average_down_time, 'average_up_time': average_up_time,
-                                     'ping_average': ping_average, 'packet_loss_average': packet_loss_average}))
+                return HttpResponse(json.dumps({'average_down_time': average_down_time,
+                                                'average_up_time': average_up_time, 'ping_average': ping_average,
+                                                'packet_loss_average': packet_loss_average}),
+                                    content_type="application/json")
         pass
     else:
         return Http404("URL not found")
@@ -224,4 +256,19 @@ def individual_analytics(request):
 @csrf_exempt
 @api_view(['GET', 'POST'])
 def comparative_analytics(request):
-    pass
+    if request.method == 'GET':
+        return render(request, 'analytics/comparative_analytics.html')
+    else:
+        data = request.data
+        data = json.load(data)
+        device_names = data['devices']
+        if type(device_names) is not list:
+            return HttpResponse(json.dumps({"error": "no list found. expecting list"}), content_type="application/json")
+        elif len(device_names) is 0:
+            return HttpResponse(json.dumps({"error": "No device names found"}), content_type="application/json")
+        else:
+            response_list = []
+            for device_name in device_names:
+                response_list.append(list(Parameters.objects.filter(device_name=device_name)))
+            parameters_serializer = DeviceListSerializer(data=response_list, many=True)
+            return HttpResponse(json.dumps(parameters_serializer.data), content_type="application/json")

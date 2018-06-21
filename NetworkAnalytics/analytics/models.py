@@ -40,6 +40,7 @@ class DeviceParameters(models.Model):
     device_packet_loss = models.CharField(max_length=10, default="0%")
     device_rta = models.CharField(max_length=10, default="")  # In milliseconds
     device_checkout_time = models.CharField(max_length=10, default="")
+    id = models.AutoField(primary_key=True)
 
     def __str__(self):
         return self.device_name
@@ -54,13 +55,13 @@ class Parameters(models.Model):
     event_start_date = models.DateField(blank=False)
     event_end_time = models.CharField(blank=False, default="", max_length=1023)
     event_end_date = models.DateField(blank=False)
-    event_duration = models.BigIntegerField(default=0, blank=False)
-    event_state = models.CharField(max_length="", default="")  # Up,Down
+    event_duration = models.IntegerField(blank=False, default=0)
+    event_state = models.CharField(max_length=10, default="")  # Up,Down
     event_state_type = models.CharField(max_length=10, default="")  # Hard, Soft.
     device_ping = models.CharField(max_length=10, default="OK")
-    device_packet_loss = models.IntegerField()  # Percentage
-    device_rta = models.IntegerField()  # Milliseconds
-    device_checkout_time = models.IntegerField()  # Seconds
+    device_packet_loss = models.IntegerField(blank=False, default=0)  # Percentage
+    device_rta = models.FloatField(blank=False, default=0.0)  # Milliseconds
+    device_checkout_time = models.FloatField(blank=False, default=0.0)  # Seconds
 
     def __str__(self):
         return self.device_name

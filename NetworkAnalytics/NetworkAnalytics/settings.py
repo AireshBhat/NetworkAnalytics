@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 INSTALLED_APPS += [
     'rest_framework',
     'graphene_django',
+    'webpack_loader',
 ]
 
 INSTALLED_APPS += [
@@ -67,7 +68,8 @@ ROOT_URLCONF = 'NetworkAnalytics.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['NetworkAnalytics/NetworkAnalytics/templates', '../templates'],
+        'DIRS': [
+        'NetworkAnalytics/FrontEnd/networkanalytics/'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,6 +81,15 @@ TEMPLATES = [
         },
     },
 ]
+
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+            'BUNDLE_DIR_NAME': 'bundles/',
+            'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.dev.json'),
+        }
+}
+
 
 WSGI_APPLICATION = 'NetworkAnalytics.wsgi.application'
 

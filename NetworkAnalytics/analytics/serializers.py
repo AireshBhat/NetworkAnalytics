@@ -28,7 +28,7 @@ class DeviceSerializer(serializers.ModelSerializer):
         pass
 
 
-class DeviceSerializer(serializers.ModelSerializer):
+class DeviceParametersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Parameters
         fields = ('device_name', 'device_type', 'device_region', 'device_isp', 'event_start_time', 'event_start_date',

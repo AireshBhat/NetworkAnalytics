@@ -13,6 +13,7 @@ $(document).ready(function(){
     });
 });
 
+
 // This code is for the individual analytics page
 $(document).ready(function () {
     var ctx = document.getElementById("chart1");
