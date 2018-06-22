@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse, Http404, HttpResponse
+from django.conf import settigns
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rest_framework import status
@@ -28,7 +29,7 @@ def dashboard(request):
         return HttpResponse(jsonpickle.encode({"device_count": device_count,
         "last_upload": last_upload}), content_type = 'application/json')
     elif request.method == 'GET':
-        return render(request, 'public/index.html')
+        return render(request, 'index.html')
 
 
 @csrf_exempt
@@ -78,7 +79,7 @@ def upload_data(request):
                                                 device_region=device_region, device_isp=device_isp)
                                 print("Device Saved")
                                 device.save()
-                                file_location = '/home/nalvp' + settings.STATIC_URL + uploaded_file_name
+                                file_location = BASE_DIR + settings.STATIC_URL + uploaded_file_name
                                 df = pd.read_csv(file_location)
                                 for d in df.itertuples():
                                     try:

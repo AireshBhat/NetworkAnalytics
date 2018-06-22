@@ -74,7 +74,7 @@ module.exports = function(proxy, allowedHost) {
     https: protocol === 'https',
     host: host,
     headers: {
-          'Access-Control-Allow-Origin': '*'
+      'Access-Control-Allow-Origin': '*'
     },
     overlay: false,
     historyApiFallback: {

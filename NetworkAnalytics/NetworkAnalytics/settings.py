@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '+xzadgufezy*2k8$_gce!+6e$px*4vf+i8xjm&746u7k&oen)7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['nalvp.pythonanywhere.com', '127.0.0.1',]
 
@@ -68,8 +68,7 @@ ROOT_URLCONF = 'NetworkAnalytics.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['nalvp2/nalvp2/Frontend/networkanalytics/', '/Users/aireshbhat/sites/Websites/nalvp2/FrontEnd/networkanalytics/',
-        'nalvp2/FrontEnd/networkanalytics/'],
+        'DIRS': [os.path.join(BASE_DIR, "templates"), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,13 +81,21 @@ TEMPLATES = [
     },
 ]
 
+# if not DEBUG:
+#     WEBPACK_LOADER = {
+#         'DEFAULT': {
+#                 'BUNDLE_DIR_NAME': 'bundles/',
+#                 'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.prod.json'),
+#             }
+#     }
+# else:
+#     WEBPACK_LOADER = {
+#         'DEFAULT': {
+#                 'BUNDLE_DIR_NAME': 'bundles/',
+#                 'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.dev.json'),
+#             }
+#     }
 
-# WEBPACK_LOADER = {
-#     'DEFAULT': {
-#             'BUNDLE_DIR_NAME': 'bundles/',
-#             'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.prod.json'),
-#         }
-# }
 
 WEBPACK_LOADER = {
     'DEFAULT': {
