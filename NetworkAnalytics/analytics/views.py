@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse, Http404, HttpResponse
-from django.conf import settigns
+from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rest_framework import status
@@ -79,7 +79,7 @@ def upload_data(request):
                                                 device_region=device_region, device_isp=device_isp)
                                 print("Device Saved")
                                 device.save()
-                                file_location = BASE_DIR + settings.STATIC_URL + uploaded_file_name
+                                file_location = settings.BASE_DIR + settings.STATIC_URL + uploaded_file_name
                                 df = pd.read_csv(file_location)
                                 for d in df.itertuples():
                                     try:

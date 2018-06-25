@@ -23,12 +23,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '+xzadgufezy*2k8$_gce!+6e$px*4vf+i8xjm&746u7k&oen)7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['nalvp.pythonanywhere.com', '127.0.0.1',]
 
 
 # Application definition
+
+CORS_ORIGIN_ALLOW_ALL=True
 
 INSTALLED_APPS = [
     'jet',
@@ -53,6 +55,7 @@ INSTALLED_APPS += [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -170,4 +173,4 @@ JET_SIDE_MENU_COMPACT = False
 JET_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultIndexDashboard'
 JET_APP_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultAppIndexDashboard'
 
-
+CSRF_COOKIE_NAME = "XSRF-TOKEN"
