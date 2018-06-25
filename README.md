@@ -11,7 +11,7 @@ Create graph-based analytics on the fly based on the csv/xlsx uploaded.
 
 ## API:
 ```
-1. Create a REST client for a temporary basis to test the UI
+1. Create a REST API and UI
 2. Shift to GraphQL if need be based on progress
 ```
 
