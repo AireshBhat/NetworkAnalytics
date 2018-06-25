@@ -28,16 +28,13 @@ const styles = theme =>  ({
 
 const ButtonAppBar = (props) => {
   const { classes } = props;
-  console.log("This is classes");
-  console.log(classes);
-
   // const sideNavHandler = () => {
   //   console.log("I was clicked");
   // };
 
   return (
     <div id="root" className={classes.root}>
-      <AppBar className="appbar" position="static" colorPrimary>
+      <AppBar className="appbar" position="static" color="inherit">
         <Toolbar>
           <Typography variant="title" color="inherit" className={classes.flex} align={'center'}>
             Network Analytics

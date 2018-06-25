@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 
+import { connect } from 'react-redux';
+
 import Dropzone from 'react-dropzone';
 import styled from 'styled-components';
 
 import './UploadData.css';
 
 import axios from 'axios';
+
+import { uploadModule } from '../../store/actions/index';
 
 
 const MainDiv = styled.div`
@@ -57,30 +61,8 @@ class uploadData extends Component {
         console.log("Form Data");
         console.log(formData);
 
-        axios({
-            method: 'post',
-            url: '/uploadData/',
-            data: formData,
-            baseURL: 'http://127.0.0.1:8000/'
-        })
-            .catch(err => {
-                console.log("Error");
-                console.log(err);
-            })
-            .then((res) => {
-                console.log(res);
-                if(res === undefined){
-                    throw Error;
-                }
-                return res.json();
-            })
-            .then(parsedRes => {
-                console.log("This is the parsed Res");
-                console.log(parsedRes);
-            })
-            .catch(err => {
-                Promise.resolve(err);
-            })
+        console.log("This is the dispatch request");
+        this.props.uploadModule(formData);
     };
 
     render() {
@@ -104,4 +86,16 @@ class uploadData extends Component {
     }
 };
 
-export default uploadData;
+const mapStateToProps = state => {
+    return {
+        models: state.network.models,
+    };
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        uploadModule: (formData) => dispatch(uploadModule(formData)),
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)( uploadData );
