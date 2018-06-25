@@ -24,6 +24,7 @@ Create graph-based analytics on the fly based on the csv/xlsx uploaded.
 | '/individualAnalytics/'       | Options to query a particular device in multiple ways to generate and download those graphs | individual_analytics.html | body:{"device_name": } ; response:{Parameters List} |
 | '/comparativeAnalytics/'      | Add options to compare similar parameters and tabulate them | 'comparative_analytics.html' | body:{"devices":[list of devices]} ; response:{Parameters}  |
 | 'deviceStats/'| returns important parameters related to the device | body:{"device_name":, "start_date":, "end_date":, } | response:{"average_ping":, "average_up_time":, "average_down_time":,"average_rta":} |
+|'/devices/'| list of devices on server | returns device list| None|
 
 ### UI Specs:
 
