@@ -22,15 +22,22 @@ const Icon20 = props => <SvgIcon size={props.size || 20} icon={props.icon} />;
 
 const SideNav = withRR4();
 
-const MainDiv = styled.div`
-    width: 100%;
+const Div = styled.div`
 `;
 
-const SideNavDiv = styled.div`
+const MainDiv = styled.div`
+    height: 100%;
     display: flex;
     display: -webkit-flex;
     -webkit-flex-direction: row; /* Safari */
     flex-direction:         row;
+`;
+
+const SideNavDiv = styled.div`
+    // border-right: 1px solid #aeaeae;
+    width: 16%;
+    height: 1000px;
+    box-shadow: 10px 0 5px -5px #aeaeae;
 `;
 
 const RoutedDiv = styled.div`
@@ -62,11 +69,11 @@ class App extends Component {
   render() {
     return (
         <Router>
-            <MainDiv>
+            <Div>
                 <AppBar color="secondary"/>
-                <SideNavDiv>
-                    <div style={{width: '16%'}}>
-                        <SideNav default='dashboard' highlightBgColor='blue' highlightColor='white'>
+                <MainDiv>
+                    <SideNavDiv>
+                        <SideNav default='dashboard' highlightBgColor="#eee" highlightColor="#E91E63">
                             <Title> Basic SideNav </Title>
                             <Divider />
                             <Nav id='dashboard'>
@@ -78,13 +85,13 @@ class App extends Component {
                                 <NavText><NavTextStyle>  Upload Data</NavTextStyle> </NavText>
                             </Nav>
                         </SideNav>
-                    </div>
+                    </SideNavDiv>
                     <RoutedDiv>
                         <Route exact path="/(|dashboard)/" component={Dashboard}/>
                         <Route path="/uploadData/" component={UploadData}/>
                     </RoutedDiv>
-                </SideNavDiv>
-            </MainDiv>
+                </MainDiv>
+            </Div>
         </Router>
     );
   }
