@@ -9,7 +9,11 @@ import { getModules } from '../../store/actions/index';
 
 import styled from 'styled-components';
 import Button from '@material-ui/core/Button';
+// import Card from '@material-ui/core/Card';
 import './Dashboard.css';
+
+import LineChart from '../../components/LineChart/LineChart';
+import AreaChart from '../../components/AreaChart/AreaChart';
 
 const Dashboard = styled.div`
     // border: 1px solid #222222;
@@ -19,6 +23,20 @@ const Dashboard = styled.div`
 
 const OutlinedButton = styled.div`
     margin: 10px;
+`;
+
+const AnalysisGraphs = styled.div`
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction:         row;
+`;
+
+const GraphDiv = styled.div`
+    margin: 15px;
+    box-shadow: 0 0 20px #dddddd;
+    width: 40%;
+    height: 40%;
 `;
 
 class dashboard extends Component {
@@ -44,6 +62,14 @@ class dashboard extends Component {
         return (
             <Dashboard>
                 {moduleNames}
+                <AnalysisGraphs>
+                    <GraphDiv>
+                        <LineChart />
+                    </GraphDiv>
+                    <GraphDiv>
+                        <AreaChart />
+                    </GraphDiv>
+                </AnalysisGraphs>
             </Dashboard>
         );
     };

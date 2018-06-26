@@ -26,39 +26,44 @@ export const setIndMod = (module, module_name) => {
 
 export const uploadModule = (formData) => {
     return dispatch => {
-        axios({
-            method: 'post',
-            url: '/uploadData/',
-            data: formData,
-            baseURL: 'http://127.0.0.1:8000/'
+        const url_fetch = 'http://nalvp.pythonanywhere.com/uploadData/';
+        // const url_fetch = 'http://127.0.0.1:8000/uploadData/';
+        const userName = 'nalvp';
+        const ticket = 'na@lvpei';
+        fetch(url_fetch, {
+            method: 'POST',
+            header: {
+                'Authorisation': 'Basic ' + window.btoa(userName + ':' + ticket),
+            },
+            body: formData,
         })
             .catch(err => {
-                console.log("Error");
                 console.log(err);
             })
-            .then((res) => {
+            .then(res => {
                 console.log(res);
-                if(res === undefined){
-                    throw Error;
-                }
                 return res.json();
             })
             .then(parsedRes => {
-                console.log("This is the parsed Res");
                 console.log(parsedRes);
+                dispatch(getModules());
             })
-            .catch(err => {
-                Promise.resolve(err);
-            })
+
     };
 };
 
 export const getModules = () => {
     return dispatch => {
         dispatch(setLoader(true));
-        const url_fetch = 'http://127.0.0.1:8000/devices/';
+        const url_fetch = 'http://nalvp.pythonanywhere.com/devices/';
+        // const url_fetch = 'http://127.0.0.1:8000/devices/';
+        const userName = 'nalvp';
+        const ticket = 'na@lvpei';
         fetch(url_fetch, {
             method: 'GET',
+             headers: {
+                'Authorisation': 'Basic ' + window.btoa(userName + ':' + ticket),
+            }
         })
             .catch(err => {
                 console.log(err);
@@ -95,7 +100,8 @@ export const getModules = () => {
 export const getIndividualAnal = (data) => {
     return dispatch => {
         console.log(JSON.stringify(data));
-        const url_fetch = 'http://127.0.0.1:8000/individualAnalytics/';
+        const url_fetch = 'http://nalvp.pythonanywhere.com/individualAnalytics/';
+        // const url_fetch = 'http://127.0.0.1:8000/individualAnalytics/';
         const userName = 'nalvp';
         const ticket = 'na@lvpei';
         fetch(url_fetch, {

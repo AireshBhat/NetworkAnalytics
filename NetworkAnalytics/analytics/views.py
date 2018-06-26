@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.http import JsonResponse, Http404, HttpResponse
-from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rest_framework import status
@@ -16,6 +15,7 @@ from .constants import *
 import pandas as pd
 import json
 import jsonpickle
+import datetime
 
 @csrf_exempt
 @api_view(['GET', 'POST'])
@@ -29,7 +29,7 @@ def dashboard(request):
         return HttpResponse(jsonpickle.encode({"device_count": device_count,
         "last_upload": last_upload}), content_type = 'application/json')
     elif request.method == 'GET':
-        return render(request, 'index.html')
+        return render(request, 'analytics/dashboard.html')
 
 
 @csrf_exempt
@@ -63,7 +63,6 @@ def upload_data(request):
                                 try:
                                     Device.objects.get(device_name=device_name).delete()
                                     DeviceParameters.objects.filter(device_name=device_name).delete()
-                                    Parameters.objects.filter(device_name=device_name).delete()
                                 except Exception as e:
                                     pass
                                 device_region = uploaded_file_name.split('_')[1]
@@ -77,9 +76,9 @@ def upload_data(request):
                                         break
                                 device = Device(device_name=device_name, device_type=device_type,
                                                 device_region=device_region, device_isp=device_isp)
-                                print("Device Saved")
                                 device.save()
-                                file_location = settings.BASE_DIR + settings.STATIC_URL + uploaded_file_name
+                                file_location = '~/Coding/Python/Network_Analytics/NetworkAnalytics/NetworkAnalytics/' +\
+                                                settings.STATIC_URL + uploaded_file_name
                                 df = pd.read_csv(file_location)
                                 for d in df.itertuples():
                                     try:
@@ -108,7 +107,8 @@ def upload_data(request):
                                             device_ping = ""
                                             device_packet_loss = ""
                                             device_rta = ""
-                                            device_checkout_time = d[5].split('Host check timed out after ')[1].replace(" seconds)", "")
+                                            device_checkout_time = d[5].split('Host check timed out after ')[1].replace(
+                                                " seconds)", "")
                                         device_parameters = DeviceParameters.objects.create()
                                         device_parameters.device_name = device_name
                                         device_parameters.device_type = device_type
@@ -157,7 +157,8 @@ def upload_data(request):
                                         else:
                                             parameters.device_rta = 0.0
                                         if device_checkout_time is not "":
-                                            parameters.device_checkout_time = float(device_checkout_time.replace(" seconds", ""))
+                                            parameters.device_checkout_time = float(
+                                                device_checkout_time.replace(" seconds", ""))
                                         else:
                                             parameters.device_checkout_time = 0.0
                                         parameters.save()
@@ -165,8 +166,7 @@ def upload_data(request):
                                     except Exception as e:
                                         print("saving exception")
                                         print(e)
-                                        pass
-                                return JsonResponse(json.dumps({'status': 'ok'}), safe=False)
+                                return JsonResponse({'status': 'ok'})
                             else:
                                 device_exists_message = device_name + ' exists'
                                 return JsonResponse({'error': device_exists_message})
@@ -196,8 +196,8 @@ def individual_data(request):
             return JsonResponse(json.dumps({'error': 'No Device Name found'}), safe=False)
         else:
             print(device_name)
-            device_info = Parameters.objects.filter(device_name=device_name)
-            device_serializer = DeviceParametersSerializer(data=device_info, many=True)
+            device_info = DeviceParameters.objects.filter(device_name=device_name)
+            device_serializer = DeviceSerializer(data=device_info, many=True)
             if device_serializer.is_valid():
                 return JsonResponse(device_serializer.data, safe=False)
             else:
@@ -222,7 +222,6 @@ def device_list(request):
 def individual_analytics(request):
     if request.method == 'POST':
         data = request.data
-        data = json.load(data)
         device_name = data['device_name']
         print("Inside individual analytics")
         if device_name is None:
@@ -236,18 +235,19 @@ def individual_analytics(request):
                 try:
                     search_filter_date_start = data['start_date']
                     device_info = device_info.filter(event_start_date__gte=search_filter_date_start)
+                    print(device_info)
                 except KeyError as ke:
-                    try:
+                    """try:
                         search_filter_date_end = data['end_date']
                         device_info = device_info.filter(event_end_date__lte=search_filter_date_end)
-                    except KeyError as ke:
-                        pass
+                    except KeyError as ke:"""
+                    pass
                 average_down_time = compute_down_time(device_info)
                 average_up_time = compute_up_time(device_info)
-                ping_average = compute_average_ping(device_info)
+                # ping_average = compute_average_ping(device_info)
                 packet_loss_average = compute_average_packet_loss(device_info)
                 return HttpResponse(json.dumps({'average_down_time': average_down_time,
-                                                'average_up_time': average_up_time, 'ping_average': ping_average,
+                                                'average_up_time': average_up_time,#  'ping_average': ping_average,
                                                 'packet_loss_average': packet_loss_average}),
                                     content_type="application/json")
         pass
@@ -260,16 +260,18 @@ def comparative_analytics(request):
     if request.method == 'GET':
         return render(request, 'analytics/comparative_analytics.html')
     else:
+        print("POST")
         data = request.data
-        data = json.load(data)
         device_names = data['devices']
+        print(device_names)
         if type(device_names) is not list:
             return HttpResponse(json.dumps({"error": "no list found. expecting list"}), content_type="application/json")
         elif len(device_names) is 0:
             return HttpResponse(json.dumps({"error": "No device names found"}), content_type="application/json")
         else:
-            response_list = []
+            response_list = Parameters.objects.all()
             for device_name in device_names:
-                response_list.append(list(Parameters.objects.filter(device_name=device_name)))
+                response_list = response_list.filter(device_name=device_name)
             parameters_serializer = DeviceListSerializer(data=response_list, many=True)
-            return HttpResponse(json.dumps(parameters_serializer.data), content_type="application/json")
+            if parameters_serializer.is_valid() or True:
+                return HttpResponse(json.dumps(parameters_serializer.data), content_type="application/json")
