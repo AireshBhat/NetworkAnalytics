@@ -7,8 +7,8 @@ import { connect } from 'react-redux';
 import { deviceAnalytics } from '../../store/actions/index';
 
 class analytics extends Component {
-  componentDidMount () {
-    console.log(this.props);
+  constructor (props) {
+    super(props);
     this.state = {
       modules: this.props.modules,
     };
@@ -30,3 +30,4 @@ const mapStateToProps = state => {
 };
 
 export default connect(mapStateToProps, null)( analytics );
+
