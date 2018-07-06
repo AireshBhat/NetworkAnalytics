@@ -14,6 +14,7 @@ import { uploadModule } from '../../store/actions/index';
 
 const MainDiv = styled.div`
     width: 100%;
+    height: 100%;
     display: -webkit-flex;
     display: flex;
     height: 400px;
@@ -48,20 +49,12 @@ class uploadData extends Component {
         this.setState({
             files
         });
-        console.log("Files");
-        console.log(files);
-
-        console.log("FIles[0]");
-        console.log(files[0]);
 
         // Create a new FormData object.
         var formData = new FormData();
         formData.append('uploaded_file', files[0], files[0].name);
 
-        console.log("Form Data");
-        console.log(formData);
-
-        console.log("This is the dispatch request");
+        // This request uploads the file to the server
         this.props.uploadModule(formData);
     };
 

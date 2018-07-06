@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 
 import './AppBar.css';
 
-const styles = theme =>  ({
+const styles = theme => ({
   root: {
     flexGrow: 1,
   },
@@ -40,6 +40,7 @@ const ButtonAppBar = (props) => {
             Network Analytics
           </Typography>
         </Toolbar>
+        {props.children}
       </AppBar>
     </div>
     
