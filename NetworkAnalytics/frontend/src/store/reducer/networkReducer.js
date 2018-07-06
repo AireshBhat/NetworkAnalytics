@@ -1,9 +1,10 @@
-import { SET_MODULES, SET_LOADER, SET_INDMOD } from '../actions/actionTypesNetwork';
+import { SET_MODULES, SET_LOADER, SET_INDMOD, MOD_EXIST } from '../actions/actionTypesNetwork';
 
 const initialState = {
     modules: [],
     individualModule: [],
-    loader: true
+    loader: true,
+    moduleExist: false,
 };
 
 const reducer = (state = initialState, action) => {
@@ -25,6 +26,11 @@ const reducer = (state = initialState, action) => {
                     module_name: action.module_name,
                     module_data: action.module
                 })
+            };
+        case MOD_EXIST:
+            return {
+                ...state,
+                moduleExist: action.val,
             };
         default: 
             return state;
