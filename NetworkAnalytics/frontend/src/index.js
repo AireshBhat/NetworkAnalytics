@@ -4,24 +4,28 @@ import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
+import { BrowserRouter as Router, Route} from 'react-router-dom';
+
 import { Provider } from 'react-redux';
 import { createStore, combineReducers, applyMiddleware, compose } from  'redux';
 
 import thunk from 'redux-thunk';
 
 import networkReducer from './store/reducer/networkReducer';
+import individualReducer from './store/reducer/individual';
 
 // const rootReducer = (networkReducer);
 const rootReducer = combineReducers({
   network: networkReducer,
+  individual: individualReducer,
 });
 
 const logger = (state) => {
   return next => {
     return action => {
-      console.log('[Middleware] Dispatching', action);
+      // console.log('[Middleware] Dispatching', action);
       const result = next(action);
-      console.log('[Middleware] next state', state.getState());
+      // console.log('[Middleware] next state', state.getState());
       return result;
     };
   };
@@ -33,7 +37,9 @@ const store = createStore(rootReducer, composeEnhancers(applyMiddleware(logger, 
 
 const app = (
   <Provider store={store}>
-    <App />
+    <Router>
+      <Route path="/:filter?" component={App} />
+    </Router>
   </Provider>
 );
 
@@ -41,3 +47,4 @@ ReactDOM.render( app, document.getElementById('root') );
 registerServiceWorker();
 
 // store={store}
+

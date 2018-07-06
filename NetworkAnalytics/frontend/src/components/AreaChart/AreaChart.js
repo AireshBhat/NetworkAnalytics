@@ -16,8 +16,11 @@ class AreaChartGraph extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            individualModule: this.props.individualModule
+            device: props.device,
+            device_data: props.device_data
         }
+        // console.log("props.item: ");
+        // console.log(props.device_data);
     };
     render() {
         return (

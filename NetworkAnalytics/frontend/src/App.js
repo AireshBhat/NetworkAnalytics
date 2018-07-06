@@ -1,110 +1,154 @@
 import React, { Component } from 'react';
-import { withRR4, Nav, NavText, NavIcon } from 'react-sidenav';
 
-import { ic_business } from 'react-icons-kit/md/ic_business';
-import {ic_file_upload} from 'react-icons-kit/md/ic_file_upload';
-import Divider from '@material-ui/core/Divider';
+import { withStyles } from '@material-ui/core/styles';
 
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-
-import { connect } from 'react-redux';
+import { BrowserRouter as Router, Route} from 'react-router-dom';
 
 import AppBar from './components/AppBar/AppBar';
-import UploadData from './containers/UploadData/UploadData';
+import Drawer from './components/Drawer/Drawer';
+import Link from './components/Link/Link';
 import Dashboard from './containers/Dashboard/Dashboard';
+import Analytics from './containers/Analytics/Analytics';
+import UploadData from './containers/UploadData/UploadData';
+// import Typography from '@material-ui/core/Typography';
 
-import styled from 'styled-components';
-import SvgIcon from 'react-icons-kit';
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import ChartIcon from '@material-ui/icons/InsertChart';
+import UploadDataIcon from '@material-ui/icons/CloudUpload';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import ShowChartIcon from '@material-ui/icons/ShowChart';
 
+import { connect } from 'react-redux';
 import { getModules } from './store/actions/index';
 
-const Icon20 = props => <SvgIcon size={props.size || 20} icon={props.icon} />;
+const drawerWidth = 240;
 
-const SideNav = withRR4();
-
-const Div = styled.div`
-`;
-
-const MainDiv = styled.div`
-    height: 100%;
-    display: flex;
-    display: -webkit-flex;
-    -webkit-flex-direction: row; /* Safari */
-    flex-direction:         row;
-`;
-
-const SideNavDiv = styled.div`
-    // border-right: 1px solid #aeaeae;
-    width: 16%;
-    height: 1000px;
-    box-shadow: 10px 0 5px -5px #aeaeae;
-`;
-
-const RoutedDiv = styled.div`
-    width: 84%;
-    padding: 20;
-`;
-
-const Title = styled.div`
-    padding: 12px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-`;
-
-const NavTextStyle = styled.div`
-    padding: 16px;
-`;
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    height: '100%',
+    zIndex: 1,
+    overflow: 'hidden',
+    position: 'relative',
+    display: 'flex',
+  },
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
+  drawerPaper: {
+    position: 'relative',
+    width: drawerWidth,
+  },
+  content: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing.unit * 3,
+    minWidth: 0, // So the Typography noWrap works
+  },
+  toolbar: theme.mixins.toolbar,
+  nested: {
+    paddingLeft: theme.spacing.unit * 4,
+  },
+});
 
 class App extends Component {
-    // constructor(props) {
-    //     super(props);
-    // }
+  constructor(props) {
+        super(props);
+        this.state = {
+          value: 0,
+          modulesExist: false,
+        }
+    this.forceUpdateHandler = this.forceUpdateHandler.bind(this);
+    }
 
-    componentDidMount() {
-        // check to see if there are any modules already present
-        console.log("I am being executed");
-        this.props.getModules();
-    };
+  handleChange = (event, value) => {
+      this.setState({ value });
+  };
+
+  forceUpdateHandler = () => {
+    this.forceUpdate();
+  };
+
+  onMouseOverHandler = () => {
+    console.log("hello");
+  };
+
+  componentDidMount() {
+      // check to see if there are any modules already present
+      this.props.getModules(this.props.individualModule);
+  };
 
   render() {
+    const { classes } = this.props;
+    const modules = this.props.modules.map((item) => {
+      return (
+        <Link 
+          key={item.device_name} 
+          to={`/dashboard/` + item.device_name}
+          primary={item.device_name} 
+          icon={<ShowChartIcon />} 
+          className="classes.nested" 
+          id={item.device_name}
+        />
+      );
+    });
+
     return (
-        <Router>
-            <Div>
-                <AppBar color="secondary"/>
-                <MainDiv>
-                    <SideNavDiv>
-                        <SideNav default='dashboard' highlightBgColor="#eee" highlightColor="#E91E63">
-                            <Title> Basic SideNav </Title>
-                            <Divider />
-                            <Nav id='dashboard'>
-                                <NavIcon><Icon20 size={16} icon={ic_business} /></NavIcon>
-                                <NavText><NavTextStyle>  Dashboard</NavTextStyle> </NavText>
-                            </Nav>
-                            <Nav id='uploadData'>
-                                <NavIcon><Icon20 size={16} icon={ic_file_upload} /></NavIcon>
-                                <NavText><NavTextStyle>  Upload Data</NavTextStyle> </NavText>
-                            </Nav>
-                        </SideNav>
-                    </SideNavDiv>
-                    <RoutedDiv>
-                        <Route exact path="/(|dashboard)/" component={Dashboard}/>
-                        <Route path="/uploadData/" component={UploadData}/>
-                    </RoutedDiv>
-                </MainDiv>
-            </Div>
-        </Router>
+      <div className={classes.root}>
+        <AppBar />
+        <Drawer>
+          {this.props.moduleExist ? 
+              <Link 
+            to="/dashboard/" 
+            primary="Dashboard" 
+            icon={<DashboardIcon />} 
+            collapsible={
+              {
+                expandLess: <ExpandLess />,
+                expandMore: <ExpandMore />,
+              }}
+            >
+              {modules}
+              </Link> : 
+              <Link 
+            to="/dashboard/"
+            primary="Dashboard" 
+            icon={<DashboardIcon />} 
+          />
+          }
+      <Link to="/analytics/" primary="Analytics" icon={<ChartIcon />}/>
+      <Link to="/uploadData/" primary="Upload Data" icon={<UploadDataIcon />}/>
+    </Drawer>
+    <main className={classes.content}>
+      <div className={classes.toolbar} />
+      {this.props.moduleExist ? 
+          <Route path="/dashboard/:id" component={Dashboard}/>
+          :
+          <Route path="/dashboard/" component={Dashboard} />
+      }
+      <Route path="/analytics/" component={Analytics} />
+      <Route path="/uploadData/" component={UploadData} />
+    </main>
+  </div>
     );
   }
 }
 
-// const mapStateToProps = state => {
-//     return 
-// };
+const mapStateToProps = state => {
+  return {
+    loader: state.network.loader,
+    modules: state.network.modules,
+    individualModule: state.network.individualModule,
+    moduleExist: state.network.moduleExist,
+  };
+};
 
 const mapDispatchToProps = dispatch => {
     return {
-        getModules: () => dispatch(getModules())
+        getModules: (individualModule) => dispatch(getModules(individualModule))
     };
 };
 
-export default connect(null, mapDispatchToProps)( App );
+export default connect(mapStateToProps, mapDispatchToProps)( withStyles(styles)(App));
+// export default withStyles(styles)(App);
