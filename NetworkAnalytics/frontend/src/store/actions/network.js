@@ -1,6 +1,4 @@
-import { SET_MODULES, SET_LOADER, SET_INDMOD, MOD_EXIST } from './actionTypesNetwork';
-
-import { addModule } from './index';
+import { SET_MODULES, SET_LOADER, SET_INDMOD, MOD_EXIST, DEL_MODULE, SET_STATS } from './actionTypesNetwork';
 
 export const setModules = (modules) => {
     return {
@@ -31,25 +29,18 @@ export const modExist = (val) => {
     };
 };
 
-export const analytics = (data) => {
-    return dispatch => {
-        const url_fetch = 'http://nalvp.pythonanywhere.com/comparativeAnalytics/';
-        // const url_fetch = 'http://127.0.0.1:8000/uploadData/';
-        fetch(url_fetch, {
-            method: 'POST',
-            body: data,
-        })
-            .catch(err => {
-                console.log(err);
-            })
-            .then(res => {
-                console.log("I have been recieved");
-                console.log(res);
-                return res.json();
-            })
-            .then(parsedRes => {
-                console.log(parsedRes);
-            })
+export const delModule = module => {
+    return {
+        type: DEL_MODULE,
+        module: module,
+    };
+};
+
+export const setStats = (res, data) => {
+    return {
+        type: SET_STATS,
+        res: res,
+        data: data,
     };
 };
 
@@ -83,61 +74,48 @@ export const uploadModule = (formData, indMod) => {
 
 export const getModules = (indMod) => {
     return dispatch => {
-        if(indMod.length === 0){
-            dispatch(setLoader(true));
-            const url_fetch = 'http://nalvp.pythonanywhere.com/devices/';
-            // const url_fetch = 'http://127.0.0.1:8000/devices/';
-            // const userName = 'nalvp';
-            // const ticket = 'na@lvpei';
-            fetch(url_fetch, {
-                method: 'GET',
-                 // headers: {
-                    // 'Authorisation': 'Basic ' + window.btoa(userName + ':' + ticket),
-                    // 'Access-Control-Request-Headers' : 'content-type',
-                // }
+        dispatch(setLoader(true));
+        const url_fetch = 'http://nalvp.pythonanywhere.com/devices/';
+        // const url_fetch = 'http://127.0.0.1:8000/devices/';
+        fetch(url_fetch, {
+            method: 'GET',
+        })
+            .catch(err => {
+                console.log(err);
             })
-                .catch(err => {
-                    console.log(err);
-                })
-                .then(res => {
-                    // console.log(res);
-                    if(res === undefined){
-                        throw Error;
-                    }
-                    return res.json();
-                })
-                .then(parsedRes => {
-                    // console.log("Parsed Res");
-                    // console.log(parsedRes);
-                    if(parsedRes.length === 0){
-                        console.log("There is no device");
-                        dispatch(modExist(false));
-                    }
-                    else{
-                         // if(parsedRes.length <= 3)
-                        // console.log("There are devices");
-                        parsedRes.forEach(item => {
-                            // console.log("Result of each item");
-                            // console.log(item);
-                            // console.log(item.device_name);
+            .then(res => {
+                // console.log(res);
+                if(res === undefined){
+                    throw Error;
+                }
+                return res.json();
+            })
+            .then(parsedRes => {
+                if(parsedRes.length === 0){
+                    console.log("There is no device");
+                    dispatch(modExist(false));
+                }
+                else{
+                     // if(parsedRes.length <= 3)
+                    parsedRes.forEach(item => {
+                        let itemExists = indMod.find(mod => {
+                            return item.device_name === mod.module_name;
+                        })
+                        if(!itemExists){
                             let data = {
                                 'device_name': item.device_name
                             };
-                            // console.log("Data");
-                            // console.log(data);
                             dispatch(getIndividualAnal(data));
-                        });
-                    }
-                    dispatch(modExist(true));
-                    // dispatch(setLoader(false));
-                    dispatch(setModules(parsedRes));
-                    dispatch(addModule(parsedRes[0]));
-                })
-                .catch(err => {
-                    console.log(err);
-                    Promise.resolve(err);
-                })
-        }
+                        }
+                    });
+                }
+                dispatch(modExist(true));
+                dispatch(setModules(parsedRes));
+            })
+            .catch(err => {
+                console.log(err);
+                Promise.resolve(err);
+            })
     };
 };
 
@@ -145,13 +123,10 @@ export const getIndividualAnal = (data) => {
     return dispatch => {
         const url_fetch = 'http://nalvp.pythonanywhere.com/individualAnalytics/';
         // const url_fetch = 'http://127.0.0.1:8000/individualAnalytics/';
-        // const userName = 'nalvp';
-        // const ticket = 'na@lvpei';
         fetch(url_fetch, {
             method: 'POST',
             body: JSON.stringify(data),
             headers: {
-            //     'Authorisation': 'Basic ' + window.btoa(userName + ':' + ticket),
                 'Content-Type': 'application/json'
             }
         })
@@ -169,6 +144,31 @@ export const getIndividualAnal = (data) => {
                 // console.log(parsedRes);
                 dispatch(setIndMod(parsedRes, data.device_name));
                 dispatch(setLoader(false));
+            })
+    };
+};
+
+export const getStats = (data) => {
+    return dispatch => {
+        const url_fetch = 'http://nalvp.pythonanywhere.com/deviceStats/';
+        fetch(url_fetch, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .catch(err => {
+                console.log(err);
+            })
+            .then(res => {
+                if(res === undefined){
+                    throw Error;
+                }
+                return res.json();
+            })
+            .then(parsedRes => {
+                dispatch(setStats(parsedRes, data));
             })
     };
 };

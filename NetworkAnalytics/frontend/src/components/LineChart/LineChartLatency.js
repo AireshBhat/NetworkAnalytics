@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 
 import { 
-  AreaChart, 
-  Area,
+  LineChart, 
+  Line,
   ResponsiveContainer,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
   ReferenceLine
-  } from 'recharts';
+} from 'recharts';
 
 import moment from 'moment';
 
-class areaChart extends Component {
+class lineChart extends Component {
   componentDidMount() {
     console.log(this.props);
   };
@@ -32,7 +32,7 @@ class areaChart extends Component {
   render () {
     return (
       <ResponsiveContainer width="100%" height={450}>
-        <AreaChart
+        <LineChart
           data={this.props.data.map((item) => {
             if(item.device_rta === 0){
               return {
@@ -63,16 +63,17 @@ class areaChart extends Component {
             tickFormatter={this.yAxisTickFormatter}
           />
           <Tooltip />
-          <Area 
+          <Line
             dataKey='device_rta'
             baseline={-10}
             type='monotone'
             stroke="#000"
           />
-        </AreaChart>
+        </LineChart>
       </ResponsiveContainer>
     );
   };
 };
 
-export default areaChart;
+export default lineChart;
+

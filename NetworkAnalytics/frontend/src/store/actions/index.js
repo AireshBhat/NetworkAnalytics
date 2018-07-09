@@ -1,2 +1,2 @@
-export { uploadModule, getModules, analytics as deviceAnalytics } from './network';
-export { addModule } from './individual';
+export { uploadModule, getModules, delModule, getStats } from './network';
+export { addIndData, remIndData } from './analytics';

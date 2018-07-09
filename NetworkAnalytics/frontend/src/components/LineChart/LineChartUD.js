@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 
 import { 
-  AreaChart, 
-  Area,
+  LineChart, 
+  // Line,
   ResponsiveContainer,
   XAxis,
   YAxis,
@@ -12,7 +12,7 @@ import {
 
 import moment from 'moment';
 
-class areaChart extends Component {
+class lineChart extends Component {
   componentDidMount() {
   };
 
@@ -35,12 +35,12 @@ class areaChart extends Component {
   render () {
     return (
       <ResponsiveContainer width="100%" height={450}>
-        <AreaChart
+        <LineChart
           data={this.props.data}
           margin={{ top: 0, right: 0, left: 0, bottom: 10 }}
           height={300}
         >
-          <CartesianGrid strokeDasharray="5 5"/>
+          <CartesianGrid strokeDasharray="3 3"/>
           <XAxis 
             dataKey='event_start_time' 
             type={'number'} 
@@ -61,17 +61,12 @@ class areaChart extends Component {
               <stop offset={0.5} stopColor="red" stopOpacity={1}/>
             </linearGradient>
           </defs>
-          <Area 
-            dataKey='event_state' 
-            baseLine={-10}
-            type='step'
-            stroke="#000"
-            fill="url(#splitColor)"
-          />
-        </AreaChart>
+          {this.props.children}
+        </LineChart>
       </ResponsiveContainer>
     );
   };
 };
 
-export default areaChart;
+export default lineChart;
+

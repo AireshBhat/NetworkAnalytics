@@ -9,6 +9,8 @@ import './UploadData.css';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 
+import { withRouter } from 'react-router-dom';
+
 import { connect } from 'react-redux';
 import { uploadModule } from '../../store/actions/index';
 
@@ -41,16 +43,27 @@ class uploadData extends Component {
   };
 
   onDrop = (files) => {
-    this.setState({
+    let res = files[0].name.split('_');
+    if(!(
+      this.props.modules.find(mod => {
+        return res[0] === mod.device_name;
+      })
+    ))
+    {
+      this.setState({
         files
-    });
+      });
 
-    // Create a new FormData object.
-    var formData = new FormData();
-    formData.append('uploaded_file', files[0], files[0].name);
+      // Create a new FormData object.
+      var formData = new FormData();
+      formData.append('uploaded_file', files[0], files[0].name);
 
-    // This request uploads the file to the server
-    this.props.uploadModule(formData, this.props.indMod);
+      // This request uploads the file to the server
+      this.props.uploadModule(formData, this.props.indMod);
+    }
+    else {
+      alert("Device already exists");
+    }
   };
 
   render () {
@@ -74,7 +87,7 @@ class uploadData extends Component {
 
 const mapStateToProps = state => {
     return {
-        models: state.network.models,
+        modules: state.network.modules,
         indMod: state.network.individualModule,
     };
 };
@@ -85,4 +98,4 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)( uploadData );
+export default connect(mapStateToProps, mapDispatchToProps)( withRouter (uploadData) );
