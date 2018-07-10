@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import { withStyles } from '@material-ui/core/styles';
 
-import { BrowserRouter as Router, Route} from 'react-router-dom';
+import { Route} from 'react-router-dom';
 
 import AppBar from './components/AppBar/AppBar';
 import Drawer from './components/Drawer/Drawer';
@@ -59,15 +59,10 @@ class App extends Component {
           value: 0,
           modulesExist: false,
         }
-    this.forceUpdateHandler = this.forceUpdateHandler.bind(this);
     }
 
   handleChange = (event, value) => {
       this.setState({ value });
-  };
-
-  forceUpdateHandler = () => {
-    this.forceUpdate();
   };
 
   onMouseOverHandler = () => {
@@ -76,7 +71,9 @@ class App extends Component {
 
   componentDidMount() {
       // check to see if there are any modules already present
+    if(this.props.modules !== []){
       this.props.getModules(this.props.individualModule);
+    }
   };
 
   render() {

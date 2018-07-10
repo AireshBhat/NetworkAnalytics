@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 
-// import Typography from '@material-ui/core/Typography';
-// import Tabs from '@material-ui/core/Tabs';
-// import Tab from '@material-ui/core/Tab';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { withStyles } from '@material-ui/core/styles';
 
@@ -39,11 +36,11 @@ class dashboard extends Component {
     const statModules = this.props.individualModule.map((item, index) => {
       return (
         <Route 
-          key={item.module_name} 
-          path={ `/dashboard/` + item.module_name} 
+          key={item.device_name} 
+          path={ `/dashboard/` + item.device_name} 
           render={() => <Statistics 
-            id={item.module_name}
-            data={item.module_data}
+            id={item.device_name}
+            data={item.device_data}
           /> 
           } 
           sensitive={true}
@@ -69,7 +66,6 @@ const mapStateToProps = state => {
     loader: state.network.loader,
     modules: state.network.modules,
     individualModule: state.network.individualModule,
-    curModule: state.individual.curModule,
   };
 };
 

@@ -65,8 +65,3 @@ class link extends Component{
 };
 
 export default withStyles(styles)(link);
-
-                // <ListItem button className={classes.nested}>
-                //   <ListItemText inset primary="Starred" />
-                // </ListItem>
-

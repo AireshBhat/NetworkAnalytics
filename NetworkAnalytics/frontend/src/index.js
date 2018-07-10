@@ -12,12 +12,12 @@ import { createStore, combineReducers, applyMiddleware, compose } from  'redux';
 import thunk from 'redux-thunk';
 
 import networkReducer from './store/reducer/networkReducer';
-import individualReducer from './store/reducer/individual';
+import analyticsReducer from './store/reducer/analytics';
 
 // const rootReducer = (networkReducer);
 const rootReducer = combineReducers({
   network: networkReducer,
-  individual: individualReducer,
+  analytics: analyticsReducer,
 });
 
 const logger = (state) => {
