@@ -73,8 +73,12 @@ class statistics extends Component {
   };
 
   componentDidMount () {
-    console.log("Statistics properties");
-    console.log(this.props);
+    // console.log("Statistics properties");
+    // console.log(this.props);
+    this.fetchStatsHandler();
+  };
+
+  fetchStatsHandler = () => {
     const data = {
       device_name: this.props.id,
       start_date: this.state.event_start_date,
@@ -147,25 +151,35 @@ class statistics extends Component {
   };
 
   handleChangeStart = date => {
-    console.log("Start");
-    this.setState(prevState => {
-      return {
-        ...prevState,
-        event_start_date: date.format('YYYY-MM-DD'),
-        event_start_date_unix: date.unix(),
-      };
-    });
+    if(date.unix() > this.state.event_end_date_unix){
+      alert("End date is further than the start date.");
+    }
+    else
+    {
+      this.setState(prevState => {
+        return {
+          ...prevState,
+          event_start_date: date.format('YYYY-MM-DD'),
+          event_start_date_unix: date.unix(),
+        };
+      });
+    }
   };
 
   handleChangeEnd = dateEnd => {
-    console.log("end");
-    this.setState(prevState => {
-      return {
-        ...prevState,
-        event_end_date: dateEnd.format('YYYY-MM-DD'),
-        event_end_date_unix: dateEnd.unix(),
-      };
-    });
+    if(dateEnd.unix() < this.state.event_start_date_unix){
+      alert("End date is further than the start date.");
+    }
+    else
+    {
+      this.setState(prevState => {
+        return {
+          ...prevState,
+          event_end_date: dateEnd.format('YYYY-MM-DD'),
+          event_end_date_unix: dateEnd.unix(),
+        };
+      });
+    }
   };
 
   render() {
@@ -173,8 +187,8 @@ class statistics extends Component {
     const indMod = this.props.individualModule.find(item => {
       return this.props.id === item.device_name;
     });
-    console.log(indMod);
-    console.log("ind module");
+    // console.log(indMod);
+    // console.log("ind module");
     return (
       <div className={classes.root}>
         <Grid container spacing={24}>
@@ -216,6 +230,9 @@ class statistics extends Component {
           event_end_date_unix = {this.state.event_end_date_unix}
           handleChangeStart = {this.handleChangeStart}
           handleChangeEnd = {this.handleChangeEnd}
+          fetchStatsHandler = {this.fetchStatsHandler}
+          minDate = {moment.unix((this.props.data[0] || '').event_start_time).format('YYYY-MM-DD')}
+          maxDate = {moment.unix((this.props.data[this.props.data.length - 1] || '').event_end_time).format('YYYY-MM-DD')}
         />
         <Grid container spacing={24}>
           <Grid item xs={4}>
@@ -244,18 +261,21 @@ class statistics extends Component {
           <LineChartUD 
             data={
             this.props.data.map((item) => {
-              if(item.event_state === 'UP'){
+              if(item.event_start_time >= this.state.event_start_date_unix && item.event_end_time <= this.state.event_end_date_unix){
+                if(item.event_state === 'UP'){
+                  return {
+                    event_start_time: item.event_start_time,
+                    event_end_time: item.event_end_time,
+                    event_state: 1,
+                  };
+                }
                 return {
                   event_start_time: item.event_start_time,
                   event_end_time: item.event_end_time,
-                  event_state: 1,
+                  event_state: -1,
                 };
               }
-              return {
-                event_start_time: item.event_start_time,
-                event_end_time: item.event_end_time,
-                event_state: -1,
-              };
+              return null;
             })
           }
           ud
@@ -273,12 +293,22 @@ class statistics extends Component {
           <LineChartLatency 
             data={
               this.props.data.map((item) => {
-                return {
-                  event_start_time: item.event_start_time,
-                  event_end_time: item.event_end_time,
-                  device_ping: item.device_ping,
-                  device_rta: item.device_rta,
-                };
+                if(item.event_start_time >= this.state.event_start_date_unix && item.event_end_time <= this.state.event_end_date_unix){
+                  if(item.device_rta === 0){
+                    return {
+                      event_start_time: item.event_start_time,
+                      event_end_time: item.event_end_time,
+                      device_ping: item.device_ping,
+                    };
+                  }
+                  return {
+                    event_start_time: item.event_start_time,
+                    event_end_time: item.event_end_time,
+                    device_ping: item.device_ping,
+                    device_rta: item.device_rta,
+                  };
+                }
+                return null;
               })
             }
           />

@@ -44,7 +44,7 @@ export const setStats = (res, data) => {
     };
 };
 
-export const uploadModule = (formData, indMod) => {
+export const uploadModule = (formData, indMod, path) => {
     return dispatch => {
         const url_fetch = 'http://nalvp.pythonanywhere.com/uploadData/';
         // const url_fetch = 'http://127.0.0.1:8000/uploadData/';
@@ -68,6 +68,7 @@ export const uploadModule = (formData, indMod) => {
             .then(parsedRes => {
                 console.log(parsedRes);
                 dispatch(getModules(indMod));
+                path();
             })
     };
 };

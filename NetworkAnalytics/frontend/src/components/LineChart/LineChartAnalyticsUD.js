@@ -12,8 +12,15 @@ import {
   } from 'recharts';
 
 import Divider from '@material-ui/core/Divider';
+import { withStyles } from '@material-ui/core/styles';
 
 import moment from 'moment';
+
+const styles = theme => ({
+  unit: {
+    marginBottom: theme.spacing.unit,
+  }
+});
 
 class lineChart extends Component {
   componentDidMount() {
@@ -36,10 +43,11 @@ class lineChart extends Component {
   };
 
   render () {
+    const { classes } = this.props;
     const LineList = this.props.data.map(item => {
       console.log(item);
       return (
-        <div>
+        <div className={classes.unit}>
           <ResponsiveContainer width="100%" height={200} key={item.device_name}>
             <LineChart
               data={item.device_data}
@@ -76,7 +84,7 @@ class lineChart extends Component {
               />
             </LineChart>
             </ResponsiveContainer>
-            <Divider />
+            <Divider/>
         </div>
       );
     });
@@ -88,6 +96,6 @@ class lineChart extends Component {
   };
 };
 
-export default lineChart;
+export default withStyles(styles)(lineChart);
 
 

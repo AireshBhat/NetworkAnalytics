@@ -10,8 +10,12 @@ import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
+import LeftIcon from '@material-ui/icons/ArrowBack';
+import RightIcon from '@material-ui/icons/ArrowForward';
+import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
 // import Hidden from '@material-ui/core/Hidden';
+
 import withWidth from '@material-ui/core/withWidth';
 import compose from 'recompose/compose';
 
@@ -20,7 +24,7 @@ const styles = theme => ({
     fontSize: theme.spacing.unit * 2.5,
   },
   dividerMargin: {
-    marginTop: theme.spacing.unit * 2,
+    // marginTop: theme.spacing.unit * 2,
     paddingRight: theme.spacing.unit,
   },
   hide: {
@@ -28,6 +32,9 @@ const styles = theme => ({
     top: -(theme.spacing.unit * 9999),
     left: -(theme.spacing.unit * 9999),
   },
+  button: {
+    // marginBottom: theme.spacing.unit * 2,
+  }
 });
 
 class dateSetting extends Component {
@@ -37,11 +44,6 @@ class dateSetting extends Component {
 
   openPickerEnd = () => {
     this.pickerEnd.open();
-  };
-
-  handleChange = date => {
-    console.log("Date");
-    console.log(date);
   };
 
   render() {
@@ -54,6 +56,8 @@ class dateSetting extends Component {
         <Grid 
           container 
           direction={'row'}
+          alignItems="center"
+          justify="center"
         >
           <Grid item xs={2}>
             <Tooltip 
@@ -69,23 +73,27 @@ class dateSetting extends Component {
               {moment.unix(this.props.event_start_date_unix).format("DD/MM/YYYY")}
             </Button>
           </Tooltip>
-              <div className="picker">
-                  <DatePicker 
-                    className={classes.hide}
-                    clearable
-                    ref={(node) => {this.picker = node;}}
-                    emptyLabel=""
-                    format="D MMM YYYY"
-                    value={moment.unix(this.props.event_start_date_unix)}
-                    onChange={this.props.handleChangeStart}
-                    mask
-                  />
-              </div>
+          <div className="picker">
+            <DatePicker
+              rightArrowIcon={<RightIcon />}
+              leftArrowIcon={<LeftIcon />}
+              className={classes.hide}
+              clearable
+              ref={(node) => {this.picker = node;}}
+              emptyLabel=""
+              format="D MMM YYYY"
+              value={moment.unix(this.props.event_start_date_unix)}
+              onChange={this.props.handleChangeStart}
+              maxDate={this.props.maxDate}
+              minDate={this.props.minDate}
+              mask
+            />
+          </div>
           </Grid>
             <Grid 
               className={classes.dividerMargin} 
               item 
-              xs={8}
+              xs={7}
             >
               <Divider />
             </Grid>
@@ -102,6 +110,8 @@ class dateSetting extends Component {
               </Tooltip>
               <div className="pickerEnd">
                 <DatePicker
+                  rightArrowIcon={<RightIcon />}
+                  leftArrowIcon={<LeftIcon />}
                   className={classes.hide}
                   clearable
                   ref={(node) => {this.pickerEnd = node;}}
@@ -109,10 +119,23 @@ class dateSetting extends Component {
                   format="D MMM YYYY"
                   value={moment.unix(this.props.event_start_date_unix)}
                   onChange={this.props.handleChangeEnd}
+                  maxDate={this.props.maxDate}
+                  minDate={this.props.minDate}
                   mask
                 />
               </div>
-          </Grid>
+            </Grid>
+            <Grid 
+              className={classes.dividerMargin} 
+              item 
+              xs={1}
+            >
+              <Tooltip title={'Enter date'} id='EnterDate'>
+                <IconButton onClick={this.props.fetchStatsHandler} className={classes.button} aria-label="Forward">
+                  <RightIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid>
         </Grid>
       </MuiPickersUtilsProvider>
     );
@@ -123,11 +146,3 @@ export default compose(
   withStyles(styles),
   withWidth(),
 )(dateSetting);
-
-    // <MuiPickersUtilsProvider utils={DateFnsUtils}>
-    //   <DatePicker
-    //     value={this.props.curDate}
-    //     onChange={this.props.handleDateChange}
-    //   />
-    // </MuiPickersUtilsProvider>
-

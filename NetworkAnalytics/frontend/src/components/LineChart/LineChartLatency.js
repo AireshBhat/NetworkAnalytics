@@ -33,19 +33,7 @@ class lineChart extends Component {
     return (
       <ResponsiveContainer width="100%" height={450}>
         <LineChart
-          data={this.props.data.map((item) => {
-            if(item.device_rta === 0){
-              return {
-                event_start_time: item.event_start_time,
-                event_end_time: item.event_end_time,
-                device_ping: item.device_ping,
-              };
-            }
-            return {
-              ...item
-            };
-          })
-          }
+          data={this.props.data}
         >
           <CartesianGrid strokeDasharray="3 3"/>
           <ReferenceLine y={40} stroke='yellow' label="40ms" />

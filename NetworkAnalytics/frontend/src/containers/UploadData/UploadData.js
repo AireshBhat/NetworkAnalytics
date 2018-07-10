@@ -37,6 +37,8 @@ const UploadDiv = styled.div`
 class uploadData extends Component {
   constructor(props) {
       super(props);
+    console.log("upload Data props");
+    console.log(this.props);
       this.state={
           files: []
       };
@@ -59,10 +61,10 @@ class uploadData extends Component {
       formData.append('uploaded_file', files[0], files[0].name);
 
       // This request uploads the file to the server
-      this.props.uploadModule(formData, this.props.indMod);
+      this.props.uploadModule(formData, this.props.indMod, () => this.props.history.push('/dashboard/' + res[0]));
     }
     else {
-      alert("Device already exists");
+      this.props.history.push('/dashboard/' + res[0]);
     }
   };
 
@@ -94,7 +96,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        uploadModule: (formData, indMod) => dispatch(uploadModule(formData, indMod)),
+        uploadModule: (formData, indMod, path) => dispatch(uploadModule(formData, indMod, path)),
     };
 };
 

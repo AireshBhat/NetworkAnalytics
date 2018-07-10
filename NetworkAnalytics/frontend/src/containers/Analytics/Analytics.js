@@ -119,7 +119,9 @@ class analytics extends Component {
           />
         </Paper>
         <Paper>
-          <Typography className={classes.headerPadding} variant={'headline'}>Latency</Typography>
+          <Typography className={classes.headerPadding} variant={'headline'}>
+            Latency
+          </Typography>
           <LineChartAnalyticsLat 
             data={this.props.moduleData}
           />
