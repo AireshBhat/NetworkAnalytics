@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 
+// import * as html2canvas from 'html2canvas';
+// import * as jsPDF from 'jspdf';
+
 import { withStyles } from '@material-ui/core/styles';
 
 import { Route} from 'react-router-dom';

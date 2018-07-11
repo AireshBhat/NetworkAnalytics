@@ -14,11 +14,12 @@ import {
 
 import Divider from '@material-ui/core/Divider';
 
+import TooltipContent from '../Tooltip/Tooltip';
+
 import moment from 'moment';
 
 class lineChart extends Component {
   componentDidMount() {
-    console.log(this.props);
   };
 
   xAxisTickFormatter = date => {
@@ -35,20 +36,24 @@ class lineChart extends Component {
   render () {
     const latItems = this.props.data.map(item => {
     return(
-      <div>
+      <div key={item.device_name}>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart
             data={item.device_data.map((item) => {
-              if(item.device_rta === 0){
+              if(item.event_start_time >= this.props.event_start_date_unix && item.event_end_time <= this.props.event_end_date_unix)
+              {
+                if(item.device_rta === 0){
+                  return {
+                    event_start_time: item.event_start_time,
+                    event_end_time: item.event_end_time,
+                    device_ping: item.device_ping,
+                  };
+                }
                 return {
-                  event_start_time: item.event_start_time,
-                  event_end_time: item.event_end_time,
-                  device_ping: item.device_ping,
+                  ...item
                 };
               }
-              return {
-                ...item
-              };
+              return null;
             })
             }
           >
@@ -66,7 +71,11 @@ class lineChart extends Component {
             label={{ value: "Latency", angle: -90,}}
             tickFormatter={this.yAxisTickFormatter}
           />
-          <Tooltip />
+          <Tooltip 
+            content={
+              (data) => <TooltipContent lat data={data}/>
+            }
+          />
           <Legend />
           <Line
             dataKey='device_rta'

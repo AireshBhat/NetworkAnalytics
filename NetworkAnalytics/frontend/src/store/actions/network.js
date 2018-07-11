@@ -1,5 +1,7 @@
 import { SET_MODULES, SET_LOADER, SET_INDMOD, MOD_EXIST, DEL_MODULE, SET_STATS } from './actionTypesNetwork';
 
+import moment from 'moment';
+
 export const setModules = (modules) => {
     return {
         type: SET_MODULES,
@@ -61,12 +63,12 @@ export const uploadModule = (formData, indMod, path) => {
                 console.log(err);
             })
             .then(res => {
-                console.log("I have been recieved");
-                console.log(res);
+                // console.log("I have been recieved");
+                // console.log(res);
                 return res.json();
             })
             .then(parsedRes => {
-                console.log(parsedRes);
+                // console.log(parsedRes);
                 dispatch(getModules(indMod));
                 path();
             })
@@ -74,6 +76,7 @@ export const uploadModule = (formData, indMod, path) => {
 };
 
 export const getModules = (indMod) => {
+    
     return dispatch => {
         dispatch(setLoader(true));
         const url_fetch = 'http://nalvp.pythonanywhere.com/devices/';
@@ -99,9 +102,10 @@ export const getModules = (indMod) => {
                 else{
                      // if(parsedRes.length <= 3)
                     parsedRes.forEach(item => {
-                        let itemExists = indMod.find(mod => {
-                            return item.device_name === mod.module_name;
+                        const itemExists = indMod.find(mod => {
+                            return item.device_name === mod.device_name;
                         })
+                        console.log(item.device_name + ': ' + itemExists);
                         if(!itemExists){
                             let data = {
                                 'device_name': item.device_name
@@ -136,14 +140,20 @@ export const getIndividualAnal = (data) => {
                 console.log(err);
             })
             .then(res => {
-                if(res === undefined){
+                if(res === undefined || res.status === 500){
                     throw Error;
                 }
                 return res.json();
             })
             .then(parsedRes => {
                 // console.log(parsedRes);
+                const data = {
+                    device_name: parsedRes[0].device_name,
+                    start_date: moment.unix( parsedRes[0].event_start_time ).format('YYYY-MM-DD'),
+                    end_date: moment.unix( parsedRes[parsedRes.length - 1].event_end_time ).format('YYYY-MM-DD'),                    
+                }
                 dispatch(setIndMod(parsedRes, data.device_name));
+                dispatch(getStats(data));
                 dispatch(setLoader(false));
             })
     };
@@ -163,7 +173,7 @@ export const getStats = (data) => {
                 console.log(err);
             })
             .then(res => {
-                if(res === undefined){
+                if(res === undefined || res.status === 500){
                     throw Error;
                 }
                 return res.json();

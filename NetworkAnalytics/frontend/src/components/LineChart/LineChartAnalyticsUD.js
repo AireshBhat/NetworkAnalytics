@@ -14,6 +14,8 @@ import {
 import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
 
+import TooltipContent from '../Tooltip/Tooltip';
+
 import moment from 'moment';
 
 const styles = theme => ({
@@ -45,12 +47,20 @@ class lineChart extends Component {
   render () {
     const { classes } = this.props;
     const LineList = this.props.data.map(item => {
-      console.log(item);
       return (
-        <div className={classes.unit}>
-          <ResponsiveContainer width="100%" height={200} key={item.device_name}>
+        <div key={item.device_name} className={classes.unit}>
+          <ResponsiveContainer width="100%" height={200} >
             <LineChart
-              data={item.device_data}
+              data={
+                item.device_data.map(item => {
+                  if(item.event_start_time >= this.props.event_start_date_unix && item.event_end_time <= this.props.event_end_date_unix){
+                    return {
+                      ...item,
+                    }
+                  }
+                  return null;
+                })
+              }
               margin={{ top: 0, right: 0, left: 0, bottom: 10 }}
               width={400}
               height={300}
@@ -67,7 +77,11 @@ class lineChart extends Component {
                 label={{ value: "State", angle: -90,}}
                 tickFormatter={this.yAxisTickFormatter}
               />
-              <Tooltip />
+              <Tooltip 
+                content={
+                  (data) => <TooltipContent ud data={data}/>
+                }
+              />
               <Legend />
               <defs>
                 <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
