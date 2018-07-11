@@ -20,9 +20,10 @@ import Button from '@material-ui/core/Button';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
+import CustomizedDot from '../../components/CustomizedDot/CustomizedDot';
 import LineChartUD from '../../components/LineChart/LineChartUD';
 import LineChartLatency from '../../components/LineChart/LineChartLatency';
-import { Line } from 'recharts';
+import { Line, LabelList } from 'recharts';
 import DateSetting from '../../components/DateSetting/DateSetting';
 
 import { delModule, getStats } from '../../store/actions/index';
@@ -285,7 +286,9 @@ class statistics extends Component {
             baseLine={-10}
             type='step'
             stroke="url(#splitColor)"
-          />
+          >
+            <LabelList content={(data) => <CustomizedDot data={data}/> } />
+          </Line>
         </LineChartUD>
         </Paper>
         <Paper>

@@ -8,9 +8,23 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  } from 'recharts';
+} from 'recharts';
 
 import moment from 'moment';
+
+import TooltipContent from '../Tooltip/Tooltip';
+
+// const TooltipContent = (props) => {
+//   console.log("tooltip");
+//   console.log(props);
+//   return (
+//     <Paper>
+//       <Typography variant="subheading">
+//         Date: {moment.unix(props.label).format('DD-MM, HH:mm')}
+//       </Typography>
+//     </Paper>
+//   );
+// };
 
 class lineChart extends Component {
   componentDidMount() {
@@ -54,7 +68,14 @@ class lineChart extends Component {
             label={{ value: "State", angle: -90,}}
             tickFormatter={this.yAxisTickFormatter}
           />
-          <Tooltip />
+          <Tooltip 
+            content={(data) => 
+              <TooltipContent 
+                data={data}
+                ud
+              />
+            }
+          />
           <defs>
             <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
               <stop offset={0.5} stopColor="green" stopOpacity={1}/>

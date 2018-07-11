@@ -8,14 +8,15 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  ReferenceLine
+  ReferenceLine,
 } from 'recharts';
 
 import moment from 'moment';
 
+import TooltipComponent from '../Tooltip/Tooltip';
+
 class lineChart extends Component {
   componentDidMount() {
-    console.log(this.props);
   };
 
   xAxisTickFormatter = date => {
@@ -50,12 +51,21 @@ class lineChart extends Component {
             label={{ value: "Latency", angle: -90,}}
             tickFormatter={this.yAxisTickFormatter}
           />
-          <Tooltip />
+          <Tooltip content={
+            (data) => 
+              <TooltipComponent 
+                data={data}
+                lat
+              />
+            }
+          />
           <Line
             dataKey='device_rta'
             baseline={-10}
             type='monotone'
             stroke="#000"
+            isAnimationActive={false}
+            dot={this.renderLabel}
           />
         </LineChart>
       </ResponsiveContainer>
