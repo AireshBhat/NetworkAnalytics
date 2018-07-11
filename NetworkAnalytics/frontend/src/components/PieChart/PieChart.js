@@ -7,6 +7,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  Tooltip,
 } from 'recharts';
 
 const COLORS = ['#66bb6a', '#ef5350', '#FFBB28', '#FF8042'];

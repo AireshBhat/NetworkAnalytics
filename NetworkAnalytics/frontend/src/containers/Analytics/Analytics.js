@@ -15,6 +15,7 @@ import { addIndData, remIndData, getStats } from '../../store/actions/index';
 import LineChartAnalyticsUD from '../../components/LineChart/LineChartAnalyticsUD';
 import LineChartAnalyticsLat from '../../components/LineChart/LineChartAnalyticsLat';
 import PieChart from '../../components/PieChart/PieChart';
+import RadarChart from '../../components/RadarChart/RadarChart';
 import DateSetting from '../../components/DateSetting/DateSetting';
 
 import moment from 'moment';
@@ -219,6 +220,24 @@ class analytics extends Component {
             direction='row'
           >
             {piSet}
+          </Grid>
+          <Grid
+            container
+            className={classes.root}
+            alignItems='center'
+            justify='center'
+            direction='row'
+          >
+            <Grid item >
+              <RadarChart data={
+                this.props.individualModule.map(item => {
+                  return {
+                    name: item.device_name,
+                    value: Math.round(item.average_up_time * 1000000)/10000 ,
+                  };
+                })
+                }/>
+            </Grid>
           </Grid>
         </Paper>
         <Divider />
