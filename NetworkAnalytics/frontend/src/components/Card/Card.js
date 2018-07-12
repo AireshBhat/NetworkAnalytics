@@ -3,11 +3,9 @@ import React, { Component } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Avatar from '@material-ui/core/Avatar';
-import IconButton from '@material-ui/core/IconButton';
+// import CardActions from '@material-ui/core/CardActions';
+// import IconButton from '@material-ui/core/IconButton';
 import Divider from '@material-ui/core/Divider';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -33,10 +31,10 @@ const GridComponent = props => {
   const classes = props.classes;
   return (
     <Grid className={classes.cardItem} container alignItems='center' direction='column' >
-      <Typography variant='title' className={classes.cardTitle}>
+      <Typography variant='subheading' className={classes.cardTitle}>
         {props.statName}
       </Typography>
-      <Typography variant='display1' {...props}>
+      <Typography variant='title' className={props.className}>
         {props.data}
       </Typography>
     </Grid>
@@ -71,12 +69,13 @@ class card extends Component {
             >
               <GridComponent 
                 classes={this.props.classes} 
-                data={Math.round((this.props.avUpTime * 10000) / 100) + '%'} 
-                statName='Up Time' className={classes.upTime}
+                data={Math.round(this.props.avUpTime * 10000) / 100 + '%'} 
+                statName='Up Time' 
+                className={classes.upTime}
               />
               <GridComponent 
                 classes={this.props.classes} 
-                data={Math.round((this.props.avDownTime * 10000) / 100) + '%'} 
+                data={Math.round(this.props.avDownTime * 10000) / 100 + '%'} 
                 statName='Down Time' 
                 className={classes.downTime}
               />

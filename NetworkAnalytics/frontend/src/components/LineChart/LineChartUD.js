@@ -1,18 +1,20 @@
 import React, { Component } from 'react';
 
 import { 
-  LineChart, 
-  // Line,
+  AreaChart,
+  Area,
   ResponsiveContainer,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
+  LabelList
 } from 'recharts';
 
 import moment from 'moment';
 
 import TooltipContent from '../Tooltip/Tooltip';
+import CustomizedDot from '../CustomizedDot/CustomizedDot';
 
 // const TooltipContent = (props) => {
 //   console.log("tooltip");
@@ -35,10 +37,10 @@ class lineChart extends Component {
   };
 
   yAxisTickFormatter = val => {
-    if(val === 1){
+    if(val === 0){
       return 'UP';
     }
-    else if(val === -1){
+    else if(val === 1){
       return 'DOWN';
     }
     else {
@@ -48,11 +50,13 @@ class lineChart extends Component {
 
   render () {
     return (
-      <ResponsiveContainer width="100%" height={450}>
-        <LineChart
+      <ResponsiveContainer width="100%" height={250}>
+        <AreaChart
           data={this.props.data}
           margin={{ top: 0, right: 0, left: 0, bottom: 10 }}
           height={300}
+          stackOffset="expand"
+          baseValue={{top: 0, right: 0, bottom: 1, left: 0}}
         >
           <CartesianGrid strokeDasharray="3 3"/>
           <XAxis 
@@ -78,12 +82,20 @@ class lineChart extends Component {
           />
           <defs>
             <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
-              <stop offset={0.5} stopColor="green" stopOpacity={1}/>
-              <stop offset={0.5} stopColor="red" stopOpacity={1}/>
+              <stop offset={1} stopColor="red" stopOpacity={1}/>
+              <stop offset={0} stopColor="green" stopOpacity={1}/>
             </linearGradient>
           </defs>
-          {this.props.children}
-        </LineChart>
+          <Area 
+              dataKey='event_state' 
+              baseLine={-10}
+              type='step'
+              stroke="url(#splitColor)"
+              fill="url(#splitColor)"
+            >
+              <LabelList content={(data) => <CustomizedDot data={data}/> } />
+            </Area>
+        </AreaChart>
       </ResponsiveContainer>
     );
   };

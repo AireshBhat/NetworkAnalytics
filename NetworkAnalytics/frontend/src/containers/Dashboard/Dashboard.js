@@ -42,6 +42,7 @@ class dashboard extends Component {
           render={() => <Statistics 
             id={item.device_name}
             data={item.device_data}
+            itemData={item}
           /> 
           } 
           sensitive={true}
