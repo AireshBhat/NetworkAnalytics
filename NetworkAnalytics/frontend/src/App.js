@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 
-// import * as html2canvas from 'html2canvas';
-// import * as jsPDF from 'jspdf';
-
 import { withStyles } from '@material-ui/core/styles';
 
 import { Route} from 'react-router-dom';
@@ -30,7 +27,7 @@ const drawerWidth = 240;
 const styles = theme => ({
   root: {
     flexGrow: 1,
-    height: '100%',
+    height: 'auto',
     zIndex: 1,
     overflow: 'hidden',
     position: 'relative',
@@ -87,6 +84,7 @@ class App extends Component {
           key={item.device_name} 
           to={`/dashboard/` + item.device_name}
           primary={item.device_name} 
+          secondary={item.device_region}
           icon={<ShowChartIcon />} 
           className="classes.nested" 
           id={item.device_name}
@@ -122,13 +120,9 @@ class App extends Component {
     </Drawer>
     <main className={classes.content}>
       <div className={classes.toolbar} />
-      {this.props.moduleExist ? 
-          <Route path="/dashboard/:id" component={Dashboard}/>
-          :
-          <Route path="/dashboard/" component={Dashboard} />
-      }
-      <Route path="/analytics/" component={Analytics} />
-      <Route path="/uploadData/" component={UploadData} />
+        <Route path="/dashboard/" component={Dashboard} />
+        <Route path="/analytics/" component={Analytics} />
+        <Route path="/uploadData/" component={UploadData} />
     </main>
   </div>
     );

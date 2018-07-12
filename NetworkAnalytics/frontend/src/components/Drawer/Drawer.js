@@ -39,22 +39,3 @@ const drawer = props => {
 };
 
 export default withStyles(styles)(drawer);
-
-// <ListItem  button>
-//           <ListItemIcon>
-//             <Dashboard />
-//           </ListItemIcon>
-//           <ListItemText primary="Dashboard" />
-//         </ListItem>
-//         <ListItem button>
-//           <ListItemIcon>
-//             <Chart />
-//           </ListItemIcon>
-//           <ListItemText primary="Analytics" />
-//         </ListItem>
-//         <ListItem button>
-//           <ListItemIcon>
-//             <UploadData />
-//           </ListItemIcon>
-//           <ListItemText primary="Upload Data" component={uploadDataLink}/>
-//         </ListItem>

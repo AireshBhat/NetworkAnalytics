@@ -7,6 +7,11 @@ import Chip from '@material-ui/core/Chip';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
+import SaveIcon from '@material-ui/icons/Save';
+import IconButton from '@material-ui/core/IconButton';
+
+import * as html2canvas from 'html2canvas';
+import * as jsPDF from 'jspdf';
 
 import { connect } from 'react-redux';
 
@@ -45,7 +50,11 @@ const styles = theme => ({
     paddingTop: theme.spacing.unit * 2,
     paddingLeft: theme.spacing.unit * 6,
     paddingBottom: theme.spacing.unit,
-  }
+  },
+  saveButton: {
+    paddingTop: 'absolute',
+    left: '95%',
+  },
 });
 
 class analytics extends Component {
@@ -53,10 +62,13 @@ class analytics extends Component {
     super(props);
     this.state = {
       modules: this.props.modules,
-      event_start_date: '',
+      event_start_date:  '',
       event_start_date_unix: '',
-      event_end_date: '',
+      event_end_date:  '',
       event_end_date_unix: '',
+    };
+    this.setSaveInput = element => {
+      this.saveInput = element;
     };
   };
 
@@ -158,6 +170,21 @@ class analytics extends Component {
     }
   };
 
+  onSaveHandler = data => {
+    // console.log(this.saveInput);
+    html2canvas(this.saveInput)
+      .then(canvas => {
+        console.log('canvas');
+        console.log(canvas);
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+        });
+        pdf.addImage(imgData, 'JPEG', 0, 0);
+        pdf.save(data+'.pdf');
+      })
+  };
+
   render () {
     const { classes } = this.props;
     const buttonSet = this.props.modules.map(item => {
@@ -197,6 +224,9 @@ class analytics extends Component {
     });
     return (
       <div>
+        <Typography className={classes.headerPadding} variant="display2">
+            General Properties
+          </Typography>
           {
           this.props.moduleData.length === 0 ? null :
             <DateSetting 
@@ -208,26 +238,25 @@ class analytics extends Component {
             />
           }
           <Paper className={classes.mainPaper}>
-          <Typography className={classes.headerPadding} variant="headline">
-            General Properties
-          </Typography>
-          <Typography className={classes.subheaderPadding} variant='subheading'> UP/DOWN </Typography>
-          <Grid
-            container
-            className={classes.root}
-            alignItems='center'
-            justify='center'
-            direction='row'
-          >
-            {piSet}
-          </Grid>
-          <Grid
-            container
-            className={classes.root}
-            alignItems='center'
-            justify='center'
-            direction='row'
-          >
+          
+            <div ref={this.setSaveInput}>
+              <Typography className={classes.subheaderPadding} variant='headline'> UP/DOWN </Typography>
+              <Grid
+                container
+                className={classes.root}
+                alignItems='center'
+                justify='center'
+                direction='row'
+              >
+                {piSet}
+              </Grid>
+            <Grid
+              container
+              className={classes.root}
+              alignItems='center'
+              justify='center'
+              direction='row'
+            >
             <Grid item >
               <RadarChart data={
                 this.props.individualModule.map(item => {
@@ -239,8 +268,15 @@ class analytics extends Component {
                 }/>
             </Grid>
           </Grid>
+        </div>
+        <IconButton onClick={()=> this.onSaveHandler('GeneralProps')} size='small' className={classes.saveButton} aria-label="Generla-Props">
+          <SaveIcon />
+        </IconButton>
         </Paper>
         <Divider />
+        <Typography className={classes.headerPadding} variant="display2">
+          Analysis
+        </Typography>
         <Grid 
           container
           className={classes.root}
@@ -250,25 +286,35 @@ class analytics extends Component {
         >
           {buttonSet}
         </Grid>
-                <Paper className={classes.mainPaper}>
-          <Typography className={classes.headerPadding} variant="headline">
-            Up/Down Time
-          </Typography>
-          <LineChartAnalyticsUD 
-            data={this.props.moduleData}
-            event_start_date_unix={this.state.event_start_date_unix}
-            event_end_date_unix={this.state.event_end_date_unix}
-          />
+        <Paper className={classes.mainPaper}>
+          <div ref={this.setSaveInput}>
+            <Typography className={classes.headerPadding} variant="headline">
+              Up/Down Time
+            </Typography>
+            <LineChartAnalyticsUD 
+              data={this.props.moduleData}
+              event_start_date_unix={this.state.event_start_date_unix}
+              event_end_date_unix={this.state.event_end_date_unix}
+            />
+          </div>
+          <IconButton onClick={()=> this.onSaveHandler('AnalyticsUD')} size='small' className={classes.saveButton} aria-label="AnalyticsUD">
+            <SaveIcon />
+          </IconButton>
         </Paper>
         <Paper>
-          <Typography className={classes.headerPadding} variant={'headline'}>
-            Latency
-          </Typography>
-          <LineChartAnalyticsLat 
-            data={this.props.moduleData}
-            event_start_date_unix={this.state.event_start_date_unix}
-            event_end_date_unix={this.state.event_end_date_unix}            
-          />
+          <div ref={this.setSaveInput}>
+            <Typography className={classes.headerPadding} variant={'headline'}>
+              Latency
+            </Typography>
+            <LineChartAnalyticsLat 
+              data={this.props.moduleData}
+              event_start_date_unix={this.state.event_start_date_unix}
+              event_end_date_unix={this.state.event_end_date_unix}            
+            />
+          </div>
+          <IconButton onClick={()=> this.onSaveHandler('AnalyticsLat')} size='small' className={classes.saveButton} aria-label="AnalyticsLat">
+            <SaveIcon />
+          </IconButton>
         </Paper>
       </div>
     );
@@ -292,4 +338,9 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)( withStyles(styles)( analytics ) );
+
+
+
+
+            
 

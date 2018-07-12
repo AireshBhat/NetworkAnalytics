@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 
+import * as html2canvas from 'html2canvas';
+import * as jsPDF from 'jspdf';
+
 import moment from 'moment';
 
 import { withRouter } from 'react-router-dom';
@@ -19,6 +22,7 @@ import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import SaveIcon from '@material-ui/icons/Save';
 
 import CustomizedDot from '../../components/CustomizedDot/CustomizedDot';
 import LineChartUD from '../../components/LineChart/LineChartUD';
@@ -55,7 +59,11 @@ const styles = theme => ({
   dividerMargin: {
     marginTop: theme.spacing.unit * 2,
     paddingRight: theme.spacing.unit,
-  }
+  },
+  saveButton: {
+    paddingTop: 'absolute',
+    left: '95%',
+  },
 });
 
 class statistics extends Component {
@@ -70,6 +78,9 @@ class statistics extends Component {
       average_up_time: '',
       average_packet_loss: '',
       dialogue_open: false,
+    };
+    this.setSaveInput = element => {
+      this.saveInput = element;
     };
   };
 
@@ -183,6 +194,21 @@ class statistics extends Component {
     }
   };
 
+  onSaveHandler = data => {
+    // console.log(this.saveInput);
+    html2canvas(this.saveInput)
+      .then(canvas => {
+        console.log('canvas');
+        console.log(canvas);
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+        });
+        pdf.addImage(imgData, 'JPEG', 0, 0);
+        pdf.save(data+'.pdf');
+      })
+  };
+
   render() {
     const { classes } = this.props;
     const indMod = this.props.individualModule.find(item => {
@@ -238,83 +264,146 @@ class statistics extends Component {
         <Grid container spacing={24}>
           <Grid item xs={4}>
             <Paper className={classes.paper}>
-              <Typography variant="subheading">Average Up Time</Typography>
-              <Typography variant="display2">{(Math.round(indMod.average_up_time * 1000000)/10000 + '%')}</Typography>
+              <Grid 
+                container
+                alignItems='center'
+                direction='row'
+                justify='space-between'
+              >
+                <Grid>
+                  <Typography variant="subheading">Average Up Time</Typography>
+                  <Typography variant="display2">{(Math.round(indMod.average_up_time * 1000000)/10000 + '%')}</Typography>
+                </Grid>
+                {
+                  false &&
+                  <Grid className={classes.saveButton}>
+                    <IconButton size='small' className={classes.button} aria-label="Delete">
+                      <SaveIcon />
+                    </IconButton>
+                  </Grid>
+                  }
+              </Grid>
             </Paper>
           </Grid>
           <Grid item xs={4}>
             <Paper className={classes.paper}>
-              <Typography variant="subheading">Average Down Time</Typography>
-              <Typography variant="display2">{(Math.round(indMod.average_down_time * 1000000)/10000 + '%')}</Typography>
+              <Grid 
+                container 
+                alignItems='center' 
+                direction='row' 
+                justify='space-between'
+              >
+                <Grid>
+                  <Typography variant="subheading">Average Down Time</Typography>
+                  <Typography variant="display2">{(Math.round(indMod.average_down_time * 1000000)/10000 + '%')}</Typography>
+                </Grid>
+                {
+                  false &&
+                  <Grid className={classes.saveButton}>
+                    <IconButton size='small' className={classes.button} aria-label="Delete">
+                      <SaveIcon />
+                    </IconButton>
+                  </Grid>                
+                  }
+              </Grid>
             </Paper>
           </Grid>
           <Grid item xs={4}>
             <Paper className={classes.paper}>
-              <Typography variant="subheading">Average Packet Loss</Typography>
-              <Typography variant="display2">{indMod.average_packet_loss + '%' || 0 + '%'}</Typography>
+              <Grid 
+                container 
+                alignItems='center' 
+                direction='row' 
+                justify='space-between'
+              >
+                <Grid>
+                  <Typography variant="subheading">Average Packet Loss</Typography>
+                  <Typography variant="display2">{((Math.round(indMod.average_packet_loss * 10000)/10000) + '%') || 0 + '%'}</Typography>
+                </Grid>
+                {
+                  false &&
+                  <Grid className={classes.saveButton}>
+                    <IconButton size='small' className={classes.button} aria-label="Delete">
+                      <SaveIcon />
+                    </IconButton>
+                  </Grid>                
+                  }
+              </Grid>
             </Paper>
           </Grid>
         </Grid>
         <Paper className={classes.mainPaper}>
-          <Typography className={classes.headerPadding} variant="headline">
-            Up/Down Time
-          </Typography>
-          <LineChartUD 
-            data={
-            this.props.data.map((item) => {
-              if(item.event_start_time >= this.state.event_start_date_unix && item.event_end_time <= this.state.event_end_date_unix){
-                if(item.event_state === 'UP'){
-                  return {
-                    event_start_time: item.event_start_time,
-                    event_end_time: item.event_end_time,
-                    event_state: 1,
-                  };
+          <div ref={this.setSaveInput}>
+            <Typography className={classes.headerPadding} variant="headline">
+              Up/Down Time
+            </Typography>
+            <LineChartUD 
+              data={
+                this.props.data.map((item) => {
+                  if(item.event_start_time >= this.state.event_start_date_unix && item.event_end_time <= this.state.event_end_date_unix){
+                    if(item.event_state === 'UP'){
+                      return {
+                        event_start_time: item.event_start_time,
+                        event_end_time: item.event_end_time,
+                        event_state: 1,
+                      };
+                    }
+                    return {
+                      event_start_time: item.event_start_time,
+                      event_end_time: item.event_end_time,
+                      event_state: -1,
+                    };
+                  }
+                  return null;
+                })
                 }
-                return {
-                  event_start_time: item.event_start_time,
-                  event_end_time: item.event_end_time,
-                  event_state: -1,
-                };
-              }
-              return null;
-            })
-          }
-          ud
-        >
-          <Line 
-            dataKey='event_state' 
-            baseLine={-10}
-            type='step'
-            stroke="url(#splitColor)"
-          >
-            <LabelList content={(data) => <CustomizedDot data={data}/> } />
-          </Line>
-        </LineChartUD>
+                ud
+              >
+            <Line 
+              dataKey='event_state' 
+              baseLine={-10}
+              type='step'
+              stroke="url(#splitColor)"
+            >
+              <LabelList content={(data) => <CustomizedDot data={data}/> } />
+            </Line>
+          </LineChartUD>
+            </div>
+            <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'UD')} size='small' className={classes.saveButton} aria-label="UD">
+              <SaveIcon />
+            </IconButton>
         </Paper>
         <Paper>
-          <Typography className={classes.headerPadding} variant={'headline'}>Latency</Typography>
-          <LineChartLatency 
-            data={
-              this.props.data.map((item) => {
-                if(item.event_start_time >= this.state.event_start_date_unix && item.event_end_time <= this.state.event_end_date_unix){
-                  if(item.device_rta === 0){
+          <div ref={this.setSaveInput}>
+            <Typography className={classes.headerPadding} variant={'headline'}>
+              Latency
+            </Typography>
+            <LineChartLatency 
+              data={
+                this.props.data.map((item) => {
+                  if(item.event_start_time >= this.state.event_start_date_unix && item.event_end_time <= this.state.event_end_date_unix){
+                    if(item.device_rta === 0){
+                      return {
+                        event_start_time: item.event_start_time,
+                        event_end_time: item.event_end_time,
+                        device_ping: item.device_ping,
+                      };
+                    }
                     return {
                       event_start_time: item.event_start_time,
                       event_end_time: item.event_end_time,
                       device_ping: item.device_ping,
+                      device_rta: item.device_rta,
                     };
                   }
-                  return {
-                    event_start_time: item.event_start_time,
-                    event_end_time: item.event_end_time,
-                    device_ping: item.device_ping,
-                    device_rta: item.device_rta,
-                  };
+                  return null;
+                })
                 }
-                return null;
-              })
-            }
-          />
+              />
+            </div>
+          <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'Latency')} size='small' className={classes.saveButton} aria-label="Latency">
+            <SaveIcon />
+          </IconButton>          
         </Paper>
       </div>
     );

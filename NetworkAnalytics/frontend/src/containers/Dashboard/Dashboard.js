@@ -7,6 +7,7 @@ import { Route, Link, withRouter, Switch } from 'react-router-dom';
 
 import Statistics from '../Statistics/Statistics';
 
+import MainDashboard from '../../components/MainDashboard/MainDashboard';
 
 import { connect } from 'react-redux';
 import { getModules } from '../../store/actions/index';
@@ -54,6 +55,11 @@ class dashboard extends Component {
     return (
       <div>
           <Switch>
+            <Route 
+              path='/dashboard/'
+              component={MainDashboard}
+              exact
+            />
             {statModules}
           </Switch>
       </div>
