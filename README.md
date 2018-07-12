@@ -25,6 +25,8 @@ Create graph-based analytics on the fly based on the csv/xlsx uploaded.
 | '/comparativeAnalytics/'      | Add options to compare similar parameters and tabulate them | 'comparative_analytics.html' | body:{"devices":[list of devices]} ; response:{Parameters}  |
 | 'deviceStats/'| returns important parameters related to the device | body:{"device_name":, "start_date":, "end_date":, } | response:{"average_ping":, "average_up_time":, "average_down_time":,"average_rta":} |
 |'/devices/'| list of devices on server | returns device list| None|
+| '/isAllowed' | returns whether the user has delete permission | "isAllowed": true or false | None |
+| '/logout/' | logs out the user and returns to login | returns to login page | None |
 
 ### UI Specs:
 
