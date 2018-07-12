@@ -8,6 +8,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
 import List from '@material-ui/core/List';
 import { withStyles } from '@material-ui/core/styles';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import IconButton from '@material-ui/core/IconButton';
 
 const styles = theme => ({
   nested: {
@@ -20,36 +23,49 @@ class link extends Component{
 
   renderLink = itemProps => <Link to={this.props.to} {...itemProps}/>;
 
-  handleClick = collapsible => {
-    if(collapsible){
-      this.setState(prevState => {
-        return {
-          open: !prevState.open
-        };
-      });
-    }
+  closeHandler = () => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        open: false,
+      };
+      }
+    );
   };
 
-  onMouseOverHandler = () => {
-    
-  };
+  openHandler = () => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        open: true,
+      };
+      }
+    );
+  };  
 
   render() {
-    const { icon, primary } = this.props;
+    const { icon, primary, secondary } = this.props;
     const { classes } = this.props;
     return (
       <span>
         <ListItem 
           button 
           component={this.renderLink} 
-          onClick={() => this.handleClick(this.props.collapsible)} 
           className={this.props.id && classes.nested}
           onMouseOver={this.props.id && this.onMouseOverHandler}
           divider={true && !this.props.id}
         >
           <ListItemIcon>{icon}</ListItemIcon>
-          <ListItemText inset primary={primary}/>
-          {this.props.collapsible && (this.state.open ? this.props.collapsible.expandLess: this.props.collapsible.expandMore)}
+          <ListItemText inset primary={primary} secondary={secondary}/>
+          {this.props.collapsible && (this.state.open ? 
+            <IconButton onClick={this.closeHandler} aria-label="ExpandLess">
+              <ExpandLess />
+            </IconButton>
+            : 
+            <IconButton onClick={this.openHandler} aria-label="ExpandMore">
+              <ExpandMore />
+            </IconButton>
+            )}
       </ListItem>
       {
         this.props.collapsible &&

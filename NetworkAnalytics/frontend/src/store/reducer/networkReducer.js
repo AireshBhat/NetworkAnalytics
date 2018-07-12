@@ -54,6 +54,12 @@ const reducer = (state = initialState, action) => {
                         average_down_time: action.res.average_down_time,
                         average_up_time: action.res.average_up_time,
                         average_packet_loss: action.res.packet_loss_average,
+                        ud_down_end_time: action.res.down_end_time,
+                        ud_down_start_time: action.res.down_start_time,
+                        down_time_count: action.res.down_time_count,
+                        rta_count: action.res.rta_counter,
+                        rta_end_time: action.res.rta_end_time,
+                        rta_start_time: action.res.rta_start_time,
                     }
                 }
                 return {

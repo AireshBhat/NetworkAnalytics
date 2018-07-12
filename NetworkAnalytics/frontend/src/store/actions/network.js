@@ -105,7 +105,6 @@ export const getModules = (indMod) => {
                         const itemExists = indMod.find(mod => {
                             return item.device_name === mod.device_name;
                         })
-                        console.log(item.device_name + ': ' + itemExists);
                         if(!itemExists){
                             let data = {
                                 'device_name': item.device_name
@@ -146,7 +145,11 @@ export const getIndividualAnal = (data) => {
                 return res.json();
             })
             .then(parsedRes => {
+                // console.log('paresedRes');
                 // console.log(parsedRes);
+                if(parsedRes.length === 0){
+                    throw Error;
+                }
                 const data = {
                     device_name: parsedRes[0].device_name,
                     start_date: moment.unix( parsedRes[0].event_start_time ).format('YYYY-MM-DD'),
@@ -155,6 +158,10 @@ export const getIndividualAnal = (data) => {
                 dispatch(setIndMod(parsedRes, data.device_name));
                 dispatch(getStats(data));
                 dispatch(setLoader(false));
+            })
+            .catch(err => {
+                Promise.resolve(err);
+                console.log(err);
             })
     };
 };
@@ -179,6 +186,7 @@ export const getStats = (data) => {
                 return res.json();
             })
             .then(parsedRes => {
+                if(data.device_name === 'ADL') console.log(parsedRes);
                 dispatch(setStats(parsedRes, data));
             })
     };
