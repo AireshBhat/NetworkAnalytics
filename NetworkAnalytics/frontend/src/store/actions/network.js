@@ -1,4 +1,4 @@
-import { SET_MODULES, SET_LOADER, SET_INDMOD, MOD_EXIST, DEL_MODULE, SET_STATS } from './actionTypesNetwork';
+import { SET_MODULES, SET_LOADER, SET_INDMOD, MOD_EXIST, DEL_MODULE, SET_STATS, SET_COUNT } from './actionTypesNetwork';
 
 import moment from 'moment';
 
@@ -43,6 +43,14 @@ export const setStats = (res, data) => {
         type: SET_STATS,
         res: res,
         data: data,
+    };
+};
+
+export const setCount = (data, deviceName) => {
+    return {
+        type: SET_COUNT,
+        data: data,
+        device_name: deviceName,
     };
 };
 
@@ -166,12 +174,12 @@ export const getIndividualAnal = (data) => {
     };
 };
 
-export const getStats = (data) => {
+export const getStats = (device) => {
     return dispatch => {
         const url_fetch = 'http://nalvp.pythonanywhere.com/deviceStats/';
         fetch(url_fetch, {
             method: 'POST',
-            body: JSON.stringify(data),
+            body: JSON.stringify(device),
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -186,8 +194,133 @@ export const getStats = (data) => {
                 return res.json();
             })
             .then(parsedRes => {
-                if(data.device_name === 'ADL') console.log(parsedRes);
-                dispatch(setStats(parsedRes, data));
+                // console.log('parsedRes');
+                // console.log(parsedRes);
+                dispatch(setStats(parsedRes, device));
+                const deviceCountData = {
+                    down_start_time: parsedRes.down_start_time,
+                    rta_start_time: parsedRes.rta_start_time,
+                };
+                dispatch(deviceCountInit(deviceCountData, 'week', device));
             })
+            .catch( err => Promise.resolve(err))
     };
+};
+
+export const deviceCountInit = (data, time, device) => {
+    return dispatch => {
+        // console.log(time);
+        // console.log(data);
+        const downTimeCount = filterData(data.down_start_time, time, device);
+        const rtaCount = filterData(data.rta_start_time, time, device);
+        // console.log('downTimeCount ' + device.device_name, downTimeCount);
+        // console.log('rtaCount' + device.device_name, rtaCount);
+        const countData = {
+            downTimeCount,
+            rtaCount,
+        };
+        dispatch(setCount(countData, device.device_name));
+    };
+};
+
+const filterData = (data, time, device) => {
+    // console.log(data);
+    let curDataCount = [];
+    let dataLength = data.length;
+    const start_date = moment(device.start_date).unix();
+    const end_date = moment(device.end_date).unix();
+    // console.log('length');
+    // console.log(dataLength);
+    let count = 0;
+    let fromNow = null;
+    let setData = null;
+    // let totalCount = 0;
+    if(dataLength === 0) {
+        // set DataCount to defualt value
+        curDataCount.push({
+            time: 'No data',
+            count: 0,
+        });
+        // totalCount = 0;
+        return curDataCount;
+    }
+    if(dataLength === 1) {
+        time === 'week' ? 
+        curDataCount.push({
+            time: moment.unix(data[0]).startOf('week').format('MMM Do') + ' - ' + moment.unix(data[0]).endOf('week').format('MMM Do'),
+            count: 1,
+        }) :
+            curDataCount.push({
+            time: moment.unix(data[0]).startOf('month').format('MMM') + ' - ' + moment.unix(data[0]).endOf('month').format('MMM'),
+            count: 1,
+        });
+        // totalCount = 1;
+        return curDataCount;
+    }
+    if(time === 'week')
+    {
+        fromNow = moment.unix(data[0]).endOf('week').format('X');
+    }
+    else {
+        fromNow = moment.unix(data[0]).endOf('month').format('X');
+        // console.log('fromnow', moment.unix(fromNow).format('MMM'));
+    }
+    count = 1;
+    for(let i = 1; i < dataLength; i++){
+        // console.log('fromnow', moment.unix( fromNow ).subtract(1, 'month').format('MMM'), moment.unix(fromNow).format('MMM'));
+        let item = data[i];
+        if(item >= start_date && item <= end_date){
+            if(time === 'week'){
+                // console.log('fromnow', fromNow);
+                if(item > fromNow){
+                    setData = {
+                        time: moment.unix( fromNow ).subtract(1, 'week').format('MMM Do') + ' - ' + moment.unix(fromNow).format('MMM Do'),
+                        count: count,
+                    };
+                    curDataCount.push(setData);
+                    // totalCount += count;
+                    // console.log('curDataCount', curDataCount);
+                    fromNow = moment.unix(item).endOf('week').format('X');
+                    count = 1;
+                }
+                else
+                {
+                    count++;
+                    // console.log('count', count);
+                }
+                // console.log('fromnow');
+                // console.log(fromNow);
+            }
+            else{
+                if(item > fromNow){
+                    setData = {
+                        time: moment.unix( fromNow ).format('MMM') + ' - ' + moment.unix(fromNow).add(1, 'month').format('MMM'),
+                        count: count,
+                    };
+                    curDataCount.push(setData);
+                    // totalCount += count;
+                    // console.log('curDataCount', curDataCount);
+                    fromNow = moment.unix(item).endOf('month').format('X');
+                    count = 1;
+                }
+                else
+                {
+                    count++;
+                    // console.log('count', count);
+                }
+            }
+        }
+    }
+    time === 'week' ?
+        curDataCount.push({
+            time: moment.unix( fromNow ).subtract(1, 'week').format('MMM Do') + ' - ' + moment.unix(fromNow).format('MMM Do'),
+            count: count,
+    }) :
+        curDataCount.push({
+            time: moment.unix( fromNow ).format('MMM') + ' - ' + moment.unix(fromNow).add(1, 'month').format('MMM'),
+            count: count,
+    });
+    // totalCount += count;
+    // console.log('totalCount', totalCount);
+    return curDataCount;
 };

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 
 import { 
-  LineChart, 
-  Line,
+  AreaChart,
+  Area,
   ResponsiveContainer,
   XAxis,
   YAxis,
@@ -33,10 +33,10 @@ class lineChart extends Component {
   };
 
   yAxisTickFormatter = val => {
-    if(val === 1){
+    if(val === 0){
       return 'UP';
     }
-    else if(val === -1){
+    else if(val === 1){
       return 'DOWN';
     }
     else {
@@ -50,7 +50,7 @@ class lineChart extends Component {
       return (
         <div key={item.device_name} className={classes.unit}>
           <ResponsiveContainer width="100%" height={200} >
-            <LineChart
+            <AreaChart
               data={
                 item.device_data.map(item => {
                   if(item.event_start_time >= this.props.event_start_date_unix && item.event_end_time <= this.props.event_end_date_unix){
@@ -85,18 +85,19 @@ class lineChart extends Component {
               <Legend />
               <defs>
                 <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset={0.5} stopColor="green" stopOpacity={1}/>
-                  <stop offset={0.5} stopColor="red" stopOpacity={1}/>
+                  <stop offset={1} stopColor="red" stopOpacity={1}/>
+                  <stop offset={0} stopColor="green" stopOpacity={1}/>
                 </linearGradient>
               </defs>
-              <Line 
+              <Area 
                 dataKey='event_state' 
                 name={item.device_name}
                 baseLine={-10}
                 type='step'
                 stroke="url(#splitColor)"
+                fill='url(#splitColor)'
               />
-            </LineChart>
+            </AreaChart>
             </ResponsiveContainer>
             <Divider/>
         </div>

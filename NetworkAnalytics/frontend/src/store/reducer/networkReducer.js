@@ -1,4 +1,4 @@
-import { SET_MODULES, SET_LOADER, SET_INDMOD, MOD_EXIST, DEL_MODULE, SET_STATS } from '../actions/actionTypesNetwork';
+import { SET_MODULES, SET_LOADER, SET_INDMOD, MOD_EXIST, DEL_MODULE, SET_STATS, SET_COUNT } from '../actions/actionTypesNetwork';
 
 const initialState = {
     modules: [],
@@ -69,6 +69,21 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 individualModule: individualModules,
+            };
+        case SET_COUNT:
+            const individualMod = state.individualModule.map(item => {
+                if(action.device_name === item.device_name){
+                    return {
+                        ...item,
+                        down_time_count_array: action.data.downTimeCount,
+                        rta_count_array: action.data.rtaCount,
+                    };
+                }
+                return {...item};
+            });
+            return {
+                ...state,
+                individualModule: individualMod,
             };
         default: 
             return state;

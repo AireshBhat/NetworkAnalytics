@@ -14,9 +14,9 @@ const styles= theme => ({
     marginBottom: theme.spacing.unit * 4,
   },
   card: {
-    maxWidth: 450,
-    minWidth: 450,
-    margin: theme.spacing.unit * 4,
+    maxWidth: 300,
+    minWidth: 300,
+    margin: theme.spacing.unit * 2,
   },
 });
 

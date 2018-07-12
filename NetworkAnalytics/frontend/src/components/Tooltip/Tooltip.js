@@ -19,7 +19,15 @@ const toolTip = props => {
       {
         props.ud &&
           <Typography variant="subheading">
-            Event State: {props.data.payload[0] ? (props.data.payload[0].payload.event_state === 1 ? 'UP' : 'DOWN') : 'Not Applicable'}
+            Event State: {
+              props.data.label ? 
+                ( props.data.payload[0] ? 
+                  props.data.payload[0].payload.event_state === 0 ? 'UP' : 'DOWN' :
+                  'Not applicable'
+                ) 
+                : 
+                'Not Applicable' 
+            }
           </Typography> 
       }
       {

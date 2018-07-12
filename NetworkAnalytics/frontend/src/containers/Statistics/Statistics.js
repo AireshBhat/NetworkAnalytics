@@ -24,13 +24,14 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import SaveIcon from '@material-ui/icons/Save';
 
-import CustomizedDot from '../../components/CustomizedDot/CustomizedDot';
+// import CustomizedDot from '../../components/CustomizedDot/CustomizedDot';
 import LineChartUD from '../../components/LineChart/LineChartUD';
 import LineChartLatency from '../../components/LineChart/LineChartLatency';
-import { Line, LabelList } from 'recharts';
+import BarChart from '../../components/BarChart/BarChart';
+// import { Line, LabelList } from 'recharts';
 import DateSetting from '../../components/DateSetting/DateSetting';
 
-import { delModule, getStats } from '../../store/actions/index';
+import { delModule, getStats, deviceCountInit } from '../../store/actions/index';
 
 const styles = theme => ({
   root: {
@@ -64,6 +65,9 @@ const styles = theme => ({
     paddingTop: 'absolute',
     left: '95%',
   },
+  tickButton: {
+    margin: theme.spacing.unit,
+  }
 });
 
 class statistics extends Component {
@@ -78,6 +82,7 @@ class statistics extends Component {
       average_up_time: '',
       average_packet_loss: '',
       dialogue_open: false,
+      tickType: 'week'
     };
     this.setSaveInput = element => {
       this.saveInput = element;
@@ -198,8 +203,6 @@ class statistics extends Component {
     // console.log(this.saveInput);
     html2canvas(this.saveInput)
       .then(canvas => {
-        console.log('canvas');
-        console.log(canvas);
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF({
           orientation: 'landscape',
@@ -207,6 +210,17 @@ class statistics extends Component {
         pdf.addImage(imgData, 'JPEG', 0, 0);
         pdf.save(data+'.pdf');
       })
+  };
+
+  setTimeHandler = (time) => {
+    this.props.deviceCountInit({
+      down_start_time: this.props.itemData.ud_down_start_time,
+      rta_start_time: this.props.itemData.rta_start_time,
+    }, time, {
+      device_name: this.props.id,
+      start_date: this.state.event_start_date,
+      end_date: this.state.event_end_date,
+    });
   };
 
   render() {
@@ -332,6 +346,41 @@ class statistics extends Component {
             </Paper>
           </Grid>
         </Grid>
+
+
+
+        <Paper className={classes.mainPaper}>
+          <div>
+            <Typography className={classes.headerPadding} variant='headline'>
+              Down Time Count
+            </Typography>
+            <BarChart 
+              data={this.props.itemData.down_time_count_array}
+            />
+          </div>
+          <Grid 
+            container 
+            direction='row-reverse'
+            justify='space-between'
+            alignItems='center'
+          >
+            <Grid item >
+              <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'Down Time Count')} size='small' aria-label="Down-Time-Count">
+                <SaveIcon />
+              </IconButton>
+            </Grid>
+            <Grid item >
+              <Button variant="outlined" color="primary" className={classes.tickButton} onClick={() => this.setTimeHandler('week')}>
+                Week
+              </Button>
+              <Button variant="outlined" color="primary" className={classes.tickButton} onClick={() => this.setTimeHandler('month')}>
+                Month
+              </Button>
+            </Grid>
+          </Grid>
+        </Paper>
+
+
         <Paper className={classes.mainPaper}>
           <div ref={this.setSaveInput}>
             <Typography className={classes.headerPadding} variant="headline">
@@ -345,13 +394,13 @@ class statistics extends Component {
                       return {
                         event_start_time: item.event_start_time,
                         event_end_time: item.event_end_time,
-                        event_state: 1,
+                        event_state: 0,
                       };
                     }
                     return {
                       event_start_time: item.event_start_time,
                       event_end_time: item.event_end_time,
-                      event_state: -1,
+                      event_state: 1,
                     };
                   }
                   return null;
@@ -359,20 +408,47 @@ class statistics extends Component {
                 }
                 ud
               >
-            <Line 
-              dataKey='event_state' 
-              baseLine={-10}
-              type='step'
-              stroke="url(#splitColor)"
-            >
-              <LabelList content={(data) => <CustomizedDot data={data}/> } />
-            </Line>
+            
           </LineChartUD>
             </div>
             <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'UD')} size='small' className={classes.saveButton} aria-label="UD">
               <SaveIcon />
             </IconButton>
         </Paper>
+
+
+        <Paper className={classes.mainPaper}>
+          <div>
+            <Typography className={classes.headerPadding} variant='headline'>
+              RTA Count(Latency > 120ms)
+            </Typography>
+            <BarChart 
+              data={this.props.itemData.rta_count_array}
+            />
+          </div>
+          <Grid 
+            container 
+            direction='row-reverse'
+            justify='space-between'
+            alignItems='center'
+          >
+            <Grid item >
+              <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'Down Time Count')} size='small' aria-label="Down-Time-Count">
+                <SaveIcon />
+              </IconButton>
+            </Grid>
+            <Grid item >
+              <Button variant="outlined" color="primary" className={classes.tickButton}>
+                Week
+              </Button>
+              <Button variant="outlined" color="primary" className={classes.tickButton}>
+                Month
+              </Button>
+            </Grid>
+          </Grid>
+        </Paper>
+
+
         <Paper>
           <div ref={this.setSaveInput}>
             <Typography className={classes.headerPadding} variant={'headline'}>
@@ -421,6 +497,7 @@ const mapDispatchToProps = dispatch => {
   return {
     delModule: module => dispatch(delModule(module)),
     getStats: data => dispatch(getStats(data)),
+    deviceCountInit: (data, time, device) => dispatch(deviceCountInit(data, time, device)),
   };
 };
 

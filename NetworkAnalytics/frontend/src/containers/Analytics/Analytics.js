@@ -60,13 +60,26 @@ const styles = theme => ({
 class analytics extends Component {
   constructor (props) {
     super(props);
-    this.state = {
-      modules: this.props.modules,
-      event_start_date:  '',
-      event_start_date_unix: '',
-      event_end_date:  '',
-      event_end_date_unix: '',
-    };
+    if(this.props.moduleData.length !== 0){
+      const dateSet = this.props.moduleData[0];
+      this.state = {
+        modules: this.props.modules,
+        event_start_date: moment.unix((dateSet.device_data[0] || '').event_start_time).format('YYYY-MM-DD') || '',
+        event_start_date_unix: (dateSet.device_data[0]).event_start_time,
+        event_end_date: moment.unix((dateSet.device_data[dateSet.device_data.length - 1] || '').event_end_time).format('YYYY-MM-DD') || '',
+        event_end_date_unix: (dateSet.device_data[dateSet.device_data.length - 1]).event_end_time,
+      };
+    }
+    else
+    {
+      this.state = {
+        modules: this.props.modules,
+        event_start_date:  '',
+        event_start_date_unix: '',
+        event_end_date:  '',
+        event_end_date_unix: '',
+      };
+    }
     this.setSaveInput = element => {
       this.saveInput = element;
     };
@@ -98,7 +111,7 @@ class analytics extends Component {
           return {
             event_start_time: item.event_start_time,
             event_end_time: item.event_end_time,
-            event_state: 1,
+            event_state: 0,
             device_ping: item.device_ping,
             device_rta: item.device_rta,
           };
@@ -106,7 +119,7 @@ class analytics extends Component {
         return {
           event_start_time: item.event_start_time,
           event_end_time: item.event_end_time,
-          event_state: -1,
+          event_state: 1,
           device_ping: item.device_ping,
           device_rta: item.device_rta,
         };
@@ -338,9 +351,3 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)( withStyles(styles)( analytics ) );
-
-
-
-
-            
-
