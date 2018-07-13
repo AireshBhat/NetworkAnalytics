@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import moment from 'moment';
 
-// import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import MomentUtils from 'material-ui-pickers/utils/moment-utils';
 import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
 import DatePicker from 'material-ui-pickers/DatePicker';
@@ -14,7 +13,6 @@ import LeftIcon from '@material-ui/icons/ArrowBack';
 import RightIcon from '@material-ui/icons/ArrowForward';
 import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
-// import Hidden from '@material-ui/core/Hidden';
 
 import withWidth from '@material-ui/core/withWidth';
 import compose from 'recompose/compose';

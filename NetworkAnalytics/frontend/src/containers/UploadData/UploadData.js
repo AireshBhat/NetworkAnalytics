@@ -5,9 +5,10 @@ import Dropzone from 'react-dropzone';
 import styled from 'styled-components';
 import './UploadData.css';
 
-// import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { withStyles } from '@material-ui/core/styles';
 
 import { withRouter } from 'react-router-dom';
 
@@ -34,14 +35,20 @@ const UploadDiv = styled.div`
   margin: 10px;
 `;
 
+const styles = theme => ({
+  progress: {
+    margin: theme.spacing.unit,
+  }
+});
+
 class uploadData extends Component {
   constructor(props) {
-      super(props);
+    super(props);
     console.log("upload Data props");
     console.log(this.props);
-      this.state={
-          files: []
-      };
+    this.state={
+      files: []
+    };
   };
 
   onDrop = (files) => {
@@ -69,6 +76,10 @@ class uploadData extends Component {
   };
 
   render () {
+    const { classes } = this.props;
+    if(this.props.loader && !this.props.err){
+      return <CircularProgress className={classes.progress} size={50} />;
+    }
     return (
       <div>
           <Typography variant="display3" gutterBottom >
@@ -88,16 +99,17 @@ class uploadData extends Component {
 };
 
 const mapStateToProps = state => {
-    return {
-        modules: state.network.modules,
-        indMod: state.network.individualModule,
-    };
+  return {
+    modules: state.network.modules,
+    indMod: state.network.individualModule,
+    loader: state.network.loader,
+  };
 };
 
 const mapDispatchToProps = dispatch => {
-    return {
-        uploadModule: (formData, indMod, push, path) => dispatch(uploadModule(formData, indMod, push, path)),
-    };
+  return {
+    uploadModule: (formData, indMod, push, path) => dispatch(uploadModule(formData, indMod, push, path)),
+  };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)( withRouter (uploadData) );
+export default connect(mapStateToProps, mapDispatchToProps)( withRouter (withStyles(styles)(uploadData)) );

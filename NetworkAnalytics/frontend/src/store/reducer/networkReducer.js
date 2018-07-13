@@ -7,7 +7,7 @@ const initialState = {
     moduleExist: false,
     err: false,
     errMessage: '',
-    token: false
+    token: false,
 };
 
 const reducer = (state = initialState, action) => {
@@ -27,7 +27,9 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 individualModule: state.individualModule.concat({
                     device_name: action.module_name,
-                    device_data: action.module
+                    device_data: action.module,
+                    device_region: action.module_region,
+                    device_isp: action.module_isp,
                 })
             };
         case MOD_EXIST:
@@ -80,6 +82,8 @@ const reducer = (state = initialState, action) => {
                         ...item,
                         down_time_count_array: action.data.downTimeCount,
                         rta_count_array: action.data.rtaCount,
+                        total_time_ud: action.data.totalTimeDurationUD,
+                        total_time_rta: action.data.totalTimeDurationRTA,
                     };
                 }
                 return {...item};

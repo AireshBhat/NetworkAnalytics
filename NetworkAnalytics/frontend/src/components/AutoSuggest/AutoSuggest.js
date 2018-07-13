@@ -1,21 +1,21 @@
 import React, { Component } from 'react';
 
-import PropTypes from 'prop-types';
-
 import { connect } from 'react-redux';
 
 import { withRouter } from 'react-router-dom';
 
 import { withStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
+import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField'
+import Grid from '@material-ui/core/Grid';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
 import Autosuggest from 'react-autosuggest';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
+import SearchIcon from '@material-ui/icons/Search';
 
 const styles = theme => ({
   container: {
@@ -24,18 +24,34 @@ const styles = theme => ({
   },
   suggestionsContainerOpen: {
     position: 'absolute',
+    width: 250,
     zIndex: theme.zIndex.appBar + 100,
     marginTop: theme.spacing.unit,
     top: theme.spacing.unit * 3,
     right: 0,
   },
   suggestion: {
+    color: 'white',
     display: 'block',
   },
   suggestionsList: {
     margin: 0,
     padding: 0,
     listStyleType: 'none',
+    color: 'white',
+  },
+  textField: {
+    color: 'white',
+  },
+  cssLabel: {
+    '&$cssFocused': {
+      color: 'white',
+    },
+  },
+  cssFocused: {
+  },
+  margin: {
+    margin: theme.spacing.unit,
   },
 });
 
@@ -60,11 +76,17 @@ class autoSuggest extends Component {
     return (
       <TextField
         fullWidth
+        className={classes.textField}
         InputProps={{
           inputRef: ref,
           classes: {
             input: classes.input,
           },
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          ),
           ...other,
         }}
       />
@@ -76,8 +98,16 @@ class autoSuggest extends Component {
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
 
-    return inputLength === 0 ? [] : this.props.modules.filter(item =>
-      item.device_name.toLowerCase().slice(0, inputLength) === inputValue
+    return inputLength === 0 ? [] : this.props.modules.filter(item => {
+      // return item.device_name.toLowerCase().slice(0, inputLength) === inputValue;
+      let probSugName = item.device_name.toLowerCase().slice(0, inputLength);
+      let probSugReg = item.device_region.toLowerCase().slice(0, inputLength);
+      let probSugIsp = item.device_isp.toLowerCase().slice(0, inputLength);
+      if(probSugName === inputValue || probSugReg === inputValue || probSugIsp === inputValue) {
+        return true;
+      }
+      return false;
+    }
     );
   };
 
@@ -92,21 +122,39 @@ class autoSuggest extends Component {
     const parts = parse(suggestion.device_name, matches);
 
     return (
-      <MenuItem selected={isHighlighted} component="div">
-        <div>
-          {parts.map((part, index) => {
-            return part.highlight ? (
-              <span key={String(index)} style={{ fontWeight: 500 }}>
-                {part.text}
-              </span>
-            ) : (
-              <strong key={String(index)} style={{ fontWeight: 300 }}>
-                {part.text}
-              </strong>
-            );
-          })}
-        </div>
-      </MenuItem>
+      <div>
+        <MenuItem selected={isHighlighted} component="div">
+          <div>
+            <Typography variant='subheading'>
+              {parts.map((part, index) => {
+                console.log('suggestion', suggestion);
+                return part.highlight ? (
+                  <span key={String(index)} style={{ fontWeight: 500 }}>
+                    {part.text}
+                  </span>
+                ) : (
+                  <strong key={String(index)} style={{ fontWeight: 300 }}>
+                    {part.text}
+                  </strong>
+                );
+              })}
+            </Typography>
+              <Grid container spacing={24} justify='space-around' direction='row' alignItems='center'>
+                <Grid item >
+                  <Typography variant='body2'>
+                    {suggestion.device_region}
+                  </Typography>
+                </Grid>
+              <Grid item >
+                <Typography variant='body2'>
+                  {suggestion.device_isp}
+                </Typography>
+              </Grid>
+            </Grid>
+          </div>
+        </MenuItem>
+        <Divider />
+      </div>
     );
   };
 

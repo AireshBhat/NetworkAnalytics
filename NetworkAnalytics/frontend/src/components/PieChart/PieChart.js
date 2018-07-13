@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import {
   PieChart,
@@ -40,7 +41,7 @@ class pieChart extends Component {
           direction='column'
         >
           <Grid item >
-            <PieChart width={200} height={200}>
+            <PieChart width={250} height={200}>
               <Pie
                 data={this.props.data}
                 dataKey='value'
@@ -58,9 +59,11 @@ class pieChart extends Component {
             </PieChart>
           </Grid>
           <Grid item >
-            <Typography variant={'body2'}>
-              {this.props.device_name}
-            </Typography>
+            <Tooltip id={this.props.device_name} title={this.props.device_isp}>
+              <Typography variant={'body2'}>
+                {this.props.device_name + ' - ' + this.props.device_region}
+              </Typography>
+            </Tooltip>
           </Grid>
         </Grid>
       </div>

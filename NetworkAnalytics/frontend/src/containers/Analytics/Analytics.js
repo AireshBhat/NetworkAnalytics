@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-// import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Chip from '@material-ui/core/Chip';
@@ -10,6 +9,8 @@ import Divider from '@material-ui/core/Divider';
 import SaveIcon from '@material-ui/icons/Save';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
+import Tooltip from '@material-ui/core/Tooltip';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import * as html2canvas from 'html2canvas';
 import * as jsPDF from 'jspdf';
@@ -27,8 +28,6 @@ import BarChart from '../../components/BarChart/BarChart';
 import Modal from '../../components/Modal/Modal';
 
 import moment from 'moment';
-
-// import Button from '../../components/AnalyticsButton/AnalyticsButton';
 
 const styles = theme => ({
   root: {
@@ -70,9 +69,9 @@ class analytics extends Component {
       const dateSet = this.props.moduleData[0];
       this.state = {
         modules: this.props.modules,
-        event_start_date: moment.unix((dateSet.device_data[0] || '').event_start_time).format('YYYY-MM-DD') || '',
+        event_start_date: moment.unix((dateSet.device_data[0]).event_start_time).format('YYYY-MM-DD'),
         event_start_date_unix: (dateSet.device_data[0]).event_start_time,
-        event_end_date: moment.unix((dateSet.device_data[dateSet.device_data.length - 1] || '').event_end_time).format('YYYY-MM-DD') || '',
+        event_end_date: moment.unix((dateSet.device_data[dateSet.device_data.length - 1]).event_end_time).format('YYYY-MM-DD'),
         event_end_date_unix: (dateSet.device_data[dateSet.device_data.length - 1]).event_end_time,
         tickType: 'month',
       };
@@ -110,12 +109,13 @@ class analytics extends Component {
         return data.device_name === item.device_name;
       });
     if(this.props.moduleData.length === 0){
+      console.log('I should take place only the first time');
       this.setState(prevState => {
         return {
           ...prevState,
-          event_start_date: moment.unix((dateSet.device_data[0] || '').event_start_time).format('YYYY-MM-DD') || '',
+          event_start_date: moment.unix((dateSet.device_data[0]).event_start_time).format('YYYY-MM-DD'),
           event_start_date_unix: (dateSet.device_data[0]).event_start_time,
-          event_end_date: moment.unix((dateSet.device_data[dateSet.device_data.length - 1] || '').event_end_time).format('YYYY-MM-DD') || '',
+          event_end_date: moment.unix((dateSet.device_data[dateSet.device_data.length - 1]).event_end_time).format('YYYY-MM-DD'),
           event_end_date_unix: (dateSet.device_data[dateSet.device_data.length - 1]).event_end_time,
         };
       });
@@ -150,7 +150,18 @@ class analytics extends Component {
         down_time_count_array: dateSet.down_time_count_array,
         rta_count_array: dateSet.rta_count_array,
         ud_down_start_time: dateSet.ud_down_start_time,
+        ud_down_end_time: dateSet.ud_down_end_time,
         rta_start_time: dateSet.rta_start_time,
+        rta_end_time: dateSet.rta_end_time,
+        total_time_ud: dateSet.total_time_ud,
+        total_time_rta: dateSet.total_time_rta,
+        average_up_time: dateSet.average_up_time,
+        average_down_time: dateSet.average_down_time,
+        average_packet_loss: dateSet.average_packet_loss,
+        device_region: dateSet.device_region,
+        device_isp: dateSet.device_isp,
+        down_time_count: dateSet.down_time_count,
+        rta_count: dateSet.rta_count,
       };
       this.props.addIndData(moduleData);
     }
@@ -209,6 +220,7 @@ class analytics extends Component {
 
   onSaveHandler = ( data, target ) => {
     // console.log(this.saveInput);
+    console.log('dimensions',target.clientWidth, target.clientHeight);
     html2canvas(target)
       .then(canvas => {
         console.log('canvas');
@@ -216,6 +228,8 @@ class analytics extends Component {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF({
           orientation: 'landscape',
+          unit: 'pt',
+          format: [target.offsetHeight, target.offsetWidth],
         });
         pdf.addImage(imgData, 'JPEG', 0, 0);
         pdf.save(data+'.pdf');
@@ -229,19 +243,12 @@ class analytics extends Component {
         tickType: time
       }
     });
-    console.log('time', time);
     this.props.moduleData.forEach(item => {
-      console.log('device Stats', {
-        down_start_time: item.ud_down_start_time,
-        rta_start_time: item.rta_start_time,
-      }, {
-        device_name: item.device_name,
-        start_date: this.state.event_start_date,
-        end_date: this.state.event_end_date,
-      });
       this.props.deviceCountInit({
         down_start_time: item.ud_down_start_time,
+        down_end_time: item.ud_down_end_time,
         rta_start_time: item.rta_start_time,
+        rta_end_time: item.rta_end_time,
       }, time, {
         device_name: item.device_name,
         start_date: this.state.event_start_date,
@@ -255,25 +262,28 @@ class analytics extends Component {
     const buttonSet = this.props.modules.map(item => {
       return (
         <Grid item key={item.device_name}>
-          <Chip
-            label={item.device_name} 
-            onClick={() => this.clickHandler(item)}
-            className={classes.chipDesign}
-            onDelete={() => this.deleteHandler(item)}
-          />
+          <Tooltip id={item.device_region + ' - ' + item.device_isp} title={item.device_region + ' - ' + item.device_isp}>
+            <Chip
+              label={item.device_name} 
+              onClick={() => this.clickHandler(item)}
+              className={classes.chipDesign}
+              onDelete={() => this.deleteHandler(item)}
+            />
+        </Tooltip>
         </Grid>
       );
     });
 
 
-    const piSet = this.props.individualModule.map(item => {
+    const piSet = this.props.moduleData.map(item => {
       // console.log('the req item');
       // console.log(item);
       return (
         <Grid item key={item.device_name}>
-          <PieChart 
-            data={
-              [
+          <Tooltip id={item.device_name} title={item.device_region + ' - ' + item.device_isp}>
+            <PieChart 
+              data={
+                [
                 {
                   name: 'UP Time',
                   value: item.average_up_time || 0,
@@ -282,14 +292,20 @@ class analytics extends Component {
                   name: 'DOWN Time',
                   value: item.average_down_time || 0
                 }
-              ]
-            }
-            device_name={item.device_name}
-          />
+                ]
+              }
+              device_name={item.device_name}
+              device_region={item.device_region}
+              device_isp={item.device_isp}
+            />
+          </Tooltip>
         </Grid>
       );
     });
 
+    if(this.props.loader && !this.props.err){
+      return <CircularProgress className={classes.progress} size={50} />;
+    }
 
     return (
       <div>
@@ -306,6 +322,15 @@ class analytics extends Component {
               fetchStatsHandler = {this.fetchStatsHandler}
             />
           }
+          <Grid 
+            container
+            className={classes.root}
+            alignItems={'center'}
+            justify={'center'}
+            direction={'row'}
+          >
+            {buttonSet}
+          </Grid>
           <Paper className={classes.mainPaper}>
           
             <div ref={this.setSaveGenProps}>
@@ -319,6 +344,7 @@ class analytics extends Component {
               >
                 {piSet}
               </Grid>
+              <Divider />
             <Grid
               container
               className={classes.root}
@@ -326,17 +352,57 @@ class analytics extends Component {
               justify='center'
               direction='row'
             >
-            <Grid item >
-              <RadarChart data={
-                this.props.individualModule.map(item => {
-                  return {
-                    name: item.device_name,
-                    value: Math.round(item.average_up_time * 1000000)/10000 ,
-                  };
-                })
-                }/>
+              <Grid item >
+                <RadarChart 
+                  data={
+                  this.props.moduleData.map(item => {
+                    return {
+                      name: item.device_name,
+                      value: Math.round(item.average_down_time * 10000)/100 ,
+                    };
+                  })
+                  }
+                  name="Down Time Percentage"
+                />
+              </Grid>
+              <Grid item >
+                <RadarChart 
+                  data={
+                  this.props.moduleData.map(item => {
+                    return {
+                      name: item.device_name,
+                      value: Math.round(item.average_packet_loss * 100)/100 ,
+                    };
+                  })
+                  }
+                  name="Packet Loss Percentage"
+                />
+              </Grid>
+              <Grid item >
+                <RadarChart data={
+                  this.props.moduleData.map(item => {
+                    return {
+                      name: item.device_name,
+                      value: item.down_time_count,
+                    };
+                  })
+                } 
+                name="Down Time Count"
+              />
+              </Grid>
+              <Grid item >
+                <RadarChart data={
+                  this.props.moduleData.map(item => {
+                    return {
+                      name: item.device_name,
+                      value: item.rta_count,
+                    };
+                  })
+                } 
+                name="RTA Count"
+              />
+              </Grid>
             </Grid>
-          </Grid>
         </div>
         <IconButton onClick={()=> this.onSaveHandler('GeneralProps', this.genProps)} size='small' className={classes.saveButton} aria-label="Generla-Props">
           <SaveIcon />
@@ -348,15 +414,7 @@ class analytics extends Component {
         <Typography className={classes.headerPadding} variant="display2">
           Analysis
         </Typography>
-        <Grid 
-          container
-          className={classes.root}
-          alignItems={'center'}
-          justify={'center'}
-          direction={'row'}
-        >
-          {buttonSet}
-        </Grid>
+        
 
 
         <Paper className={classes.mainPaper}>
@@ -384,11 +442,15 @@ class analytics extends Component {
             {
               this.props.moduleData.map(item => {
                 return(
-                  <BarChart 
-                    key={item.device_name}
-                    data={item.down_time_count_array}
-                    device_name={item.device_name}
-                  />
+                  <div key={item.device_name}>
+                    <BarChart 
+                      data={item.down_time_count_array}
+                      device_name={item.device_name}
+                    />
+                    <Typography variant='subheading' className={classes.headerPadding}>
+                      {'Total Time: ' + (item.total_time_ud !== undefined ? item.total_time_ud : 0)}
+                    </Typography>
+                  </div>
                 );
               })
             }
@@ -400,7 +462,7 @@ class analytics extends Component {
             alignItems='center'
           >
             <Grid item >
-              <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'Down Time Count', this.downCount)} size='small' aria-label="Down-Time-Count">
+              <IconButton onClick={()=> this.onSaveHandler('Down Time Count', this.downCount)} size='small' aria-label="Down-Time-Count">
                 <SaveIcon />
               </IconButton>
             </Grid>
@@ -441,11 +503,15 @@ class analytics extends Component {
             {
               this.props.moduleData.map(item => {
                 return(
-                  <BarChart 
-                    key={item.device_name}
-                    data={item.rta_count_array}
-                    device_name={item.device_name}
+                  <div key={item.device_name}>
+                    <BarChart 
+                      data={item.rta_count_array}
+                      device_name={item.device_name}
                   />
+                  <Typography variant='subheading' className={classes.headerPadding}>
+                    {'Total Time: ' + (item.total_time_rta !== undefined ? item.total_time_rta : 0)}
+                  </Typography>
+                  </div>
                 );
               })
             }
@@ -457,7 +523,7 @@ class analytics extends Component {
             alignItems='center'
           >
             <Grid item >
-              <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'Down Time Count', this.latCount)} size='small' aria-label="Down-Time-Count">
+              <IconButton onClick={()=> this.onSaveHandler('Latency Count', this.latCount)} size='small' aria-label="Down-Time-Count">
                 <SaveIcon />
               </IconButton>
             </Grid>
@@ -485,6 +551,7 @@ const mapStateToProps = state => {
     individualModule: state.network.individualModule,
     moduleData: state.analytics.moduleData,
     err: state.network.err,
+    loader: state.network.loader,
   };
 };
 
