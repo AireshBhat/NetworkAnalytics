@@ -8,6 +8,7 @@ import { Route, Link, withRouter, Switch } from 'react-router-dom';
 import Statistics from '../Statistics/Statistics';
 
 import MainDashboard from '../../components/MainDashboard/MainDashboard';
+import Modal from '../../components/Modal/Modal';
 
 import { connect } from 'react-redux';
 import { getModules } from '../../store/actions/index';
@@ -50,7 +51,7 @@ class dashboard extends Component {
       );
     });
 
-    if(this.props.loader){
+    if(this.props.loader && !this.props.err){
       return <CircularProgress className={classes.progress} size={50} />;
     }
     return (
@@ -63,6 +64,7 @@ class dashboard extends Component {
             />
             {statModules}
           </Switch>
+          {this.props.err && <Modal />}
       </div>
     );
   };
@@ -73,6 +75,7 @@ const mapStateToProps = state => {
     loader: state.network.loader,
     modules: state.network.modules,
     individualModule: state.network.individualModule,
+    err: state.network.err,
   };
 };
 

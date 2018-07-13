@@ -24,12 +24,14 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import SaveIcon from '@material-ui/icons/Save';
 
+
 // import CustomizedDot from '../../components/CustomizedDot/CustomizedDot';
 import LineChartUD from '../../components/LineChart/LineChartUD';
 import LineChartLatency from '../../components/LineChart/LineChartLatency';
 import BarChart from '../../components/BarChart/BarChart';
 // import { Line, LabelList } from 'recharts';
 import DateSetting from '../../components/DateSetting/DateSetting';
+import Modal from '../../components/Modal/Modal';
 
 import { delModule, getStats, deviceCountInit } from '../../store/actions/index';
 
@@ -82,10 +84,19 @@ class statistics extends Component {
       average_up_time: '',
       average_packet_loss: '',
       dialogue_open: false,
-      tickType: 'week'
+      tickType: 'month'
     };
-    this.setSaveInput = element => {
-      this.saveInput = element;
+    this.setSaveUD = element => {
+      this.UD = element;
+    };
+    this.setSaveDownCount = element => {
+      this.downCount = element;
+    };
+    this.setSaveLatency = element => {
+      this.latency = element;
+    };
+    this.setSaveLatCount = element => {
+      this.latCount = element;
     };
   };
 
@@ -101,7 +112,7 @@ class statistics extends Component {
       start_date: this.state.event_start_date,
       end_date: this.state.event_end_date,
     };
-    this.props.getStats(data);
+    this.props.getStats(data, this.state.tickType);
   };
 
   openDialogueHandler = () => {
@@ -199,9 +210,9 @@ class statistics extends Component {
     }
   };
 
-  onSaveHandler = data => {
+  onSaveHandler = ( data, target ) => {
     // console.log(this.saveInput);
-    html2canvas(this.saveInput)
+    html2canvas(target)
       .then(canvas => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF({
@@ -213,6 +224,12 @@ class statistics extends Component {
   };
 
   setTimeHandler = (time) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        tickType: time,
+      };
+    });
     this.props.deviceCountInit({
       down_start_time: this.props.itemData.ud_down_start_time,
       rta_start_time: this.props.itemData.rta_start_time,
@@ -238,10 +255,11 @@ class statistics extends Component {
               {this.props.id}
             </Typography>
           </Grid>
-          <Grid item xs={2}>
-            <Tooltip id="tooltip-icon" title="Delete Module">
-              <IconButton onClick={this.openDialogueHandler} className={classNames(classes.button, classes.date)} aria-label="Close">
-                <DeleteIcon />
+          { this.props.token &&
+            <Grid item xs={2}>
+              <Tooltip id="tooltip-icon" title="Delete Module">
+                <IconButton onClick={this.openDialogueHandler} className={classNames(classes.button, classes.date)} aria-label="Close">
+                  <DeleteIcon />
               </IconButton>
             </Tooltip>
               <Dialog
@@ -250,21 +268,22 @@ class statistics extends Component {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
               >
-                <DialogTitle 
-                  id="alert-dialog-title"
-                >
-                  {"Are you sure you want to delete the module?"}
-                </DialogTitle>
-                <DialogActions>
-                  <Button onClick={this.dialogueCloseHandler} color="primary">
-                    Cancel
-                  </Button>
-                  <Button onClick={this.deleteModuleHandler} color="primary" autoFocus>
-                    Delete
-                  </Button>
-                </DialogActions>
-              </Dialog>
-          </Grid>
+              <DialogTitle 
+                id="alert-dialog-title"
+              >
+                {"Are you sure you want to delete the module?"}
+              </DialogTitle>
+              <DialogActions>
+                <Button onClick={this.dialogueCloseHandler} color="primary">
+                  Cancel
+                </Button>
+              <Button onClick={this.deleteModuleHandler} color="primary" autoFocus>
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Grid>
+        }
         </Grid>
         <DateSetting 
           event_start_date_unix = {this.state.event_start_date_unix}
@@ -286,7 +305,7 @@ class statistics extends Component {
               >
                 <Grid>
                   <Typography variant="subheading">Average Up Time</Typography>
-                  <Typography variant="display2">{(Math.round(indMod.average_up_time * 1000000)/10000 + '%')}</Typography>
+                  <Typography variant="display2">{(Math.round(indMod.average_up_time * 10000)/100 + '%')}</Typography>
                 </Grid>
                 {
                   false &&
@@ -309,7 +328,7 @@ class statistics extends Component {
               >
                 <Grid>
                   <Typography variant="subheading">Average Down Time</Typography>
-                  <Typography variant="display2">{(Math.round(indMod.average_down_time * 1000000)/10000 + '%')}</Typography>
+                  <Typography variant="display2">{(Math.round(indMod.average_down_time * 10000)/100 + '%')}</Typography>
                 </Grid>
                 {
                   false &&
@@ -332,7 +351,7 @@ class statistics extends Component {
               >
                 <Grid>
                   <Typography variant="subheading">Average Packet Loss</Typography>
-                  <Typography variant="display2">{((Math.round(indMod.average_packet_loss * 10000)/10000) + '%') || 0 + '%'}</Typography>
+                  <Typography variant="display2">{((Math.round(indMod.average_packet_loss * 100)/100) + '%') || 0 + '%'}</Typography>
                 </Grid>
                 {
                   false &&
@@ -350,12 +369,13 @@ class statistics extends Component {
 
 
         <Paper className={classes.mainPaper}>
-          <div>
+          <div ref={this.setSaveDownCount}>
             <Typography className={classes.headerPadding} variant='headline'>
               Down Time Count
             </Typography>
             <BarChart 
               data={this.props.itemData.down_time_count_array}
+              device_name={this.props.id}
             />
           </div>
           <Grid 
@@ -365,7 +385,7 @@ class statistics extends Component {
             alignItems='center'
           >
             <Grid item >
-              <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'Down Time Count')} size='small' aria-label="Down-Time-Count">
+              <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'Down Time Count', this.downCount)} size='small' aria-label="Down-Time-Count">
                 <SaveIcon />
               </IconButton>
             </Grid>
@@ -382,7 +402,7 @@ class statistics extends Component {
 
 
         <Paper className={classes.mainPaper}>
-          <div ref={this.setSaveInput}>
+          <div ref={this.setSaveUD}>
             <Typography className={classes.headerPadding} variant="headline">
               Up/Down Time
             </Typography>
@@ -411,19 +431,20 @@ class statistics extends Component {
             
           </LineChartUD>
             </div>
-            <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'UD')} size='small' className={classes.saveButton} aria-label="UD">
+            <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'UD', this.UD)} size='small' className={classes.saveButton} aria-label="UD">
               <SaveIcon />
             </IconButton>
         </Paper>
 
 
         <Paper className={classes.mainPaper}>
-          <div>
+          <div ref={this.setSaveLatCount}>
             <Typography className={classes.headerPadding} variant='headline'>
               RTA Count(Latency > 120ms)
             </Typography>
             <BarChart 
               data={this.props.itemData.rta_count_array}
+              device_name={this.props.id}
             />
           </div>
           <Grid 
@@ -433,15 +454,15 @@ class statistics extends Component {
             alignItems='center'
           >
             <Grid item >
-              <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'Down Time Count')} size='small' aria-label="Down-Time-Count">
+              <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'Down Time Count', this.latCount)} size='small' aria-label="Down-Time-Count">
                 <SaveIcon />
               </IconButton>
             </Grid>
             <Grid item >
-              <Button variant="outlined" color="primary" className={classes.tickButton}>
+              <Button variant="outlined" color="primary" className={classes.tickButton} onClick={() => this.setTimeHandler('week')}>
                 Week
               </Button>
-              <Button variant="outlined" color="primary" className={classes.tickButton}>
+              <Button variant="outlined" color="primary" className={classes.tickButton} onClick={() => this.setTimeHandler('month')}>
                 Month
               </Button>
             </Grid>
@@ -450,7 +471,7 @@ class statistics extends Component {
 
 
         <Paper>
-          <div ref={this.setSaveInput}>
+          <div ref={this.setSaveLatency}>
             <Typography className={classes.headerPadding} variant={'headline'}>
               Latency
             </Typography>
@@ -477,10 +498,11 @@ class statistics extends Component {
                 }
               />
             </div>
-          <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'Latency')} size='small' className={classes.saveButton} aria-label="Latency">
+          <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'Latency', this.latency)} size='small' className={classes.saveButton} aria-label="Latency">
             <SaveIcon />
           </IconButton>          
         </Paper>
+        {this.props.err && <Modal />}
       </div>
     );
   };
@@ -490,13 +512,15 @@ const mapStateToProps = state => {
   return {
     modules: state.network.modules,
     individualModule: state.network.individualModule,
+    err: state.network.err,
+    token: state.network.token,
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     delModule: module => dispatch(delModule(module)),
-    getStats: data => dispatch(getStats(data)),
+    getStats: ( data, time ) => dispatch(getStats(data, time)),
     deviceCountInit: (data, time, device) => dispatch(deviceCountInit(data, time, device)),
   };
 };

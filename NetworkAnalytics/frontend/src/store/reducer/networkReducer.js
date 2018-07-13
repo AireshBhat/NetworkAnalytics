@@ -1,10 +1,13 @@
-import { SET_MODULES, SET_LOADER, SET_INDMOD, MOD_EXIST, DEL_MODULE, SET_STATS, SET_COUNT } from '../actions/actionTypesNetwork';
+import { SET_MODULES, SET_LOADER, SET_INDMOD, MOD_EXIST, DEL_MODULE, SET_STATS, SET_COUNT, SET_ERROR, SET_LOGIN } from '../actions/actionTypesNetwork';
 
 const initialState = {
     modules: [],
     individualModule: [],
     loader: true,
     moduleExist: false,
+    err: false,
+    errMessage: '',
+    token: false
 };
 
 const reducer = (state = initialState, action) => {
@@ -84,6 +87,17 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 individualModule: individualMod,
+            };
+        case SET_ERROR:
+            return {
+                ...state,
+                err: action.err,
+                errMessage: action.errMessage,
+            };
+        case SET_LOGIN:
+            return {
+                ...state,
+                token: action.token,
             };
         default: 
             return state;

@@ -1,4 +1,4 @@
-import { SET_MODULES, SET_LOADER, SET_INDMOD, MOD_EXIST, DEL_MODULE, SET_STATS, SET_COUNT } from './actionTypesNetwork';
+import { SET_MODULES, SET_LOADER, SET_INDMOD, MOD_EXIST, DEL_MODULE, SET_STATS, SET_COUNT, SET_COUNTANAL, SET_ERROR, SET_LOGIN } from './actionTypesNetwork';
 
 import moment from 'moment';
 
@@ -54,7 +54,30 @@ export const setCount = (data, deviceName) => {
     };
 };
 
-export const uploadModule = (formData, indMod, path) => {
+export const setCountAnalytics = (data, device_name) => {
+    return {
+        type: SET_COUNTANAL,
+        data: data,
+        device_name: device_name,
+    };
+};
+
+export const setError = (err, errMessage) => {
+    return {
+        type: SET_ERROR,
+        err,
+        errMessage,
+    };
+};
+
+export const setLogin = (token) => {
+    return {
+        type: SET_LOGIN,
+        token: token
+    };
+};
+
+export const uploadModule = (formData, indMod, push, path) => {
     return dispatch => {
         const url_fetch = 'http://nalvp.pythonanywhere.com/uploadData/';
         // const url_fetch = 'http://127.0.0.1:8000/uploadData/';
@@ -69,16 +92,21 @@ export const uploadModule = (formData, indMod, path) => {
         })
             .catch(err => {
                 console.log(err);
+                dispatch(setError(true, err));
             })
             .then(res => {
                 // console.log("I have been recieved");
-                // console.log(res);
+                // console.log('uploadRes',res);
                 return res.json();
             })
             .then(parsedRes => {
-                // console.log(parsedRes);
+                // console.log('fileError',parsedRes);
+                if('error' in parsedRes){
+                    dispatch(setError(true, parsedRes.error));
+                    
+                }
                 dispatch(getModules(indMod));
-                path();
+                push(path);
             })
     };
 };
@@ -87,13 +115,13 @@ export const getModules = (indMod) => {
     
     return dispatch => {
         dispatch(setLoader(true));
+        dispatch(getLogin());
         const url_fetch = 'http://nalvp.pythonanywhere.com/devices/';
         // const url_fetch = 'http://127.0.0.1:8000/devices/';
         fetch(url_fetch, {
             method: 'GET',
         })
             .catch(err => {
-                console.log(err);
             })
             .then(res => {
                 // console.log(res);
@@ -103,23 +131,29 @@ export const getModules = (indMod) => {
                 return res.json();
             })
             .then(parsedRes => {
-                if(parsedRes.length === 0){
-                    console.log("There is no device");
-                    dispatch(modExist(false));
+                if('error' in parsedRes){
+                    dispatch(setError(true, parsedRes.error));
                 }
-                else{
-                     // if(parsedRes.length <= 3)
-                    parsedRes.forEach(item => {
-                        const itemExists = indMod.find(mod => {
-                            return item.device_name === mod.device_name;
-                        })
-                        if(!itemExists){
-                            let data = {
-                                'device_name': item.device_name
-                            };
-                            dispatch(getIndividualAnal(data));
-                        }
-                    });
+                else
+                {
+                    if(parsedRes.length === 0){
+                        console.log("There is no device");
+                        dispatch(modExist(false));
+                    }
+                    else{
+                        // if(parsedRes.length <= 3)
+                        parsedRes.forEach(item => {
+                            const itemExists = indMod.find(mod => {
+                                return item.device_name === mod.device_name;
+                            })
+                            if(!itemExists){
+                                let data = {
+                                    'device_name': item.device_name
+                                };
+                                dispatch(getIndividualAnal(data));
+                            }
+                        });
+                    }
                 }
                 dispatch(modExist(true));
                 dispatch(setModules(parsedRes));
@@ -155,17 +189,23 @@ export const getIndividualAnal = (data) => {
             .then(parsedRes => {
                 // console.log('paresedRes');
                 // console.log(parsedRes);
-                if(parsedRes.length === 0){
-                    throw Error;
+                if('error' in parsedRes){
+                    dispatch(setError(true, parsedRes.error));
                 }
-                const data = {
-                    device_name: parsedRes[0].device_name,
-                    start_date: moment.unix( parsedRes[0].event_start_time ).format('YYYY-MM-DD'),
-                    end_date: moment.unix( parsedRes[parsedRes.length - 1].event_end_time ).format('YYYY-MM-DD'),                    
+                else
+                {
+                    if(parsedRes.length === 0){
+                        throw Error;
+                    }
+                    const data = {
+                        device_name: parsedRes[0].device_name,
+                        start_date: moment.unix( parsedRes[0].event_start_time ).format('YYYY-MM-DD'),
+                        end_date: moment.unix( parsedRes[parsedRes.length - 1].event_end_time ).format('YYYY-MM-DD'),                    
+                    }
+                    dispatch(setIndMod(parsedRes, data.device_name));
+                    dispatch(getStats(data, null));
+                    dispatch(setLoader(false));
                 }
-                dispatch(setIndMod(parsedRes, data.device_name));
-                dispatch(getStats(data));
-                dispatch(setLoader(false));
             })
             .catch(err => {
                 Promise.resolve(err);
@@ -174,7 +214,7 @@ export const getIndividualAnal = (data) => {
     };
 };
 
-export const getStats = (device) => {
+export const getStats = (device, time) => {
     return dispatch => {
         const url_fetch = 'http://nalvp.pythonanywhere.com/deviceStats/';
         fetch(url_fetch, {
@@ -189,6 +229,7 @@ export const getStats = (device) => {
             })
             .then(res => {
                 if(res === undefined || res.status === 500){
+                    dispatch(setError(true, 'Server Error: 500'));
                     throw Error;
                 }
                 return res.json();
@@ -196,14 +237,25 @@ export const getStats = (device) => {
             .then(parsedRes => {
                 // console.log('parsedRes');
                 // console.log(parsedRes);
-                dispatch(setStats(parsedRes, device));
-                const deviceCountData = {
-                    down_start_time: parsedRes.down_start_time,
-                    rta_start_time: parsedRes.rta_start_time,
-                };
-                dispatch(deviceCountInit(deviceCountData, 'week', device));
+                if('error' in parsedRes){
+                    dispatch(setError(true, parsedRes.error));
+                }
+                else
+                {
+                    dispatch(setStats(parsedRes, device));
+                    const deviceCountData = {
+                        down_start_time: parsedRes.down_start_time,
+                        rta_start_time: parsedRes.rta_start_time,
+                    };
+                    const curTime = time === null ? 'month': time;
+                    dispatch(deviceCountInit(deviceCountData, curTime, device));
+                }
             })
-            .catch( err => Promise.resolve(err))
+            .catch( err => 
+                {
+                    Promise.resolve(err)
+                }
+            )
     };
 };
 
@@ -220,6 +272,7 @@ export const deviceCountInit = (data, time, device) => {
             rtaCount,
         };
         dispatch(setCount(countData, device.device_name));
+        dispatch(setCountAnalytics(countData, device.device_name));
     };
 };
 
@@ -238,7 +291,7 @@ const filterData = (data, time, device) => {
     if(dataLength === 0) {
         // set DataCount to defualt value
         curDataCount.push({
-            time: 'No data',
+            time: '0 Count',
             count: 0,
         });
         // totalCount = 0;
@@ -251,7 +304,7 @@ const filterData = (data, time, device) => {
             count: 1,
         }) :
             curDataCount.push({
-            time: moment.unix(data[0]).startOf('month').format('MMM') + ' - ' + moment.unix(data[0]).endOf('month').format('MMM'),
+            time: moment.unix(data[0]).startOf('month').format('MMM') ,
             count: 1,
         });
         // totalCount = 1;
@@ -294,7 +347,7 @@ const filterData = (data, time, device) => {
             else{
                 if(item > fromNow){
                     setData = {
-                        time: moment.unix( fromNow ).format('MMM') + ' - ' + moment.unix(fromNow).add(1, 'month').format('MMM'),
+                        time: moment.unix( fromNow ).format('MMM'),
                         count: count,
                     };
                     curDataCount.push(setData);
@@ -317,10 +370,38 @@ const filterData = (data, time, device) => {
             count: count,
     }) :
         curDataCount.push({
-            time: moment.unix( fromNow ).format('MMM') + ' - ' + moment.unix(fromNow).add(1, 'month').format('MMM'),
+            time: moment.unix( fromNow ).format('MMM'),
             count: count,
     });
     // totalCount += count;
     // console.log('totalCount', totalCount);
     return curDataCount;
+};
+
+export const getLogin = () => {
+    return dispatch => {
+        const url_fetch = 'http://nalvp.pythonanywhere.com/isAllowed/';
+        fetch(url_fetch, {
+            method: 'GET',
+        })
+            .catch(err => {
+                console.log(err);
+            })
+            .then(res => {
+                if(res === undefined || res.status === 500){
+                    dispatch(setError(true, 'Server Error: 500'));
+                    throw Error;
+                }
+                return res.json();
+            })
+            .then(parsedRes => {
+                // console.log('parsedRes');
+                console.log('parsedRes', parsedRes);
+            })
+            .catch( err => 
+                {
+                    Promise.resolve(err)
+                }
+            )
+    };
 };
