@@ -61,7 +61,7 @@ class uploadData extends Component {
       formData.append('uploaded_file', files[0], files[0].name);
 
       // This request uploads the file to the server
-      this.props.uploadModule(formData, this.props.indMod, () => this.props.history.push('/dashboard/' + res[0]));
+      this.props.uploadModule(formData, this.props.indMod, (path) => this.props.history.push(path), '/dashboard/' + res[0]);
     }
     else {
       this.props.history.push('/dashboard/' + res[0]);
@@ -96,7 +96,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        uploadModule: (formData, indMod, path) => dispatch(uploadModule(formData, indMod, path)),
+        uploadModule: (formData, indMod, push, path) => dispatch(uploadModule(formData, indMod, push, path)),
     };
 };
 

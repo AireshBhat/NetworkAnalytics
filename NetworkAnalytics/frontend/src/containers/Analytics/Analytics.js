@@ -9,19 +9,22 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import SaveIcon from '@material-ui/icons/Save';
 import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
 
 import * as html2canvas from 'html2canvas';
 import * as jsPDF from 'jspdf';
 
 import { connect } from 'react-redux';
 
-import { addIndData, remIndData, getStats } from '../../store/actions/index';
+import { addIndData, remIndData, getStats, deviceCountInit } from '../../store/actions/index';
 
 import LineChartAnalyticsUD from '../../components/LineChart/LineChartAnalyticsUD';
 import LineChartAnalyticsLat from '../../components/LineChart/LineChartAnalyticsLat';
 import PieChart from '../../components/PieChart/PieChart';
 import RadarChart from '../../components/RadarChart/RadarChart';
 import DateSetting from '../../components/DateSetting/DateSetting';
+import BarChart from '../../components/BarChart/BarChart';
+import Modal from '../../components/Modal/Modal';
 
 import moment from 'moment';
 
@@ -55,6 +58,9 @@ const styles = theme => ({
     paddingTop: 'absolute',
     left: '95%',
   },
+  tickButton: {
+    margin: theme.spacing.unit,
+  }
 });
 
 class analytics extends Component {
@@ -68,6 +74,7 @@ class analytics extends Component {
         event_start_date_unix: (dateSet.device_data[0]).event_start_time,
         event_end_date: moment.unix((dateSet.device_data[dateSet.device_data.length - 1] || '').event_end_time).format('YYYY-MM-DD') || '',
         event_end_date_unix: (dateSet.device_data[dateSet.device_data.length - 1]).event_end_time,
+        tickType: 'month',
       };
     }
     else
@@ -78,18 +85,31 @@ class analytics extends Component {
         event_start_date_unix: '',
         event_end_date:  '',
         event_end_date_unix: '',
+        tickType: 'month',
       };
     }
-    this.setSaveInput = element => {
-      this.saveInput = element;
+    this.setSaveGenProps = element => {
+      this.genProps = element;
+    };
+    this.setSaveUD = element => {
+      this.UD = element;
+    };
+    this.setSaveDownCount = element => {
+      this.downCount = element;
+    };
+    this.setSaveLatency = element => {
+      this.latency = element;
+    };
+    this.setSaveLatCount = element => {
+      this.latCount = element;
     };
   };
 
   clickHandler = (data) => {
-    if(this.props.moduleData.length === 0){
-      const dateSet = this.props.individualModule.find(item => {
+    const dateSet = this.props.individualModule.find(item => {
         return data.device_name === item.device_name;
       });
+    if(this.props.moduleData.length === 0){
       this.setState(prevState => {
         return {
           ...prevState,
@@ -127,6 +147,10 @@ class analytics extends Component {
       const moduleData = {
         device_name: data.device_name,
         device_data: module_data,
+        down_time_count_array: dateSet.down_time_count_array,
+        rta_count_array: dateSet.rta_count_array,
+        ud_down_start_time: dateSet.ud_down_start_time,
+        rta_start_time: dateSet.rta_start_time,
       };
       this.props.addIndData(moduleData);
     }
@@ -163,7 +187,7 @@ class analytics extends Component {
         start_date: this.state.event_start_date,
         end_date: this.state.event_end_date,
       }
-      this.props.getStats(data);
+      this.props.getStats(data, this.state.tickType);
     });
   };
 
@@ -183,9 +207,9 @@ class analytics extends Component {
     }
   };
 
-  onSaveHandler = data => {
+  onSaveHandler = ( data, target ) => {
     // console.log(this.saveInput);
-    html2canvas(this.saveInput)
+    html2canvas(target)
       .then(canvas => {
         console.log('canvas');
         console.log(canvas);
@@ -196,6 +220,34 @@ class analytics extends Component {
         pdf.addImage(imgData, 'JPEG', 0, 0);
         pdf.save(data+'.pdf');
       })
+  };
+
+  setTimeHandler = (time) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        tickType: time
+      }
+    });
+    console.log('time', time);
+    this.props.moduleData.forEach(item => {
+      console.log('device Stats', {
+        down_start_time: item.ud_down_start_time,
+        rta_start_time: item.rta_start_time,
+      }, {
+        device_name: item.device_name,
+        start_date: this.state.event_start_date,
+        end_date: this.state.event_end_date,
+      });
+      this.props.deviceCountInit({
+        down_start_time: item.ud_down_start_time,
+        rta_start_time: item.rta_start_time,
+      }, time, {
+        device_name: item.device_name,
+        start_date: this.state.event_start_date,
+        end_date: this.state.event_end_date,
+      });
+    })
   };
 
   render () {
@@ -212,6 +264,8 @@ class analytics extends Component {
         </Grid>
       );
     });
+
+
     const piSet = this.props.individualModule.map(item => {
       // console.log('the req item');
       // console.log(item);
@@ -235,6 +289,8 @@ class analytics extends Component {
         </Grid>
       );
     });
+
+
     return (
       <div>
         <Typography className={classes.headerPadding} variant="display2">
@@ -252,7 +308,7 @@ class analytics extends Component {
           }
           <Paper className={classes.mainPaper}>
           
-            <div ref={this.setSaveInput}>
+            <div ref={this.setSaveGenProps}>
               <Typography className={classes.subheaderPadding} variant='headline'> UP/DOWN </Typography>
               <Grid
                 container
@@ -282,11 +338,13 @@ class analytics extends Component {
             </Grid>
           </Grid>
         </div>
-        <IconButton onClick={()=> this.onSaveHandler('GeneralProps')} size='small' className={classes.saveButton} aria-label="Generla-Props">
+        <IconButton onClick={()=> this.onSaveHandler('GeneralProps', this.genProps)} size='small' className={classes.saveButton} aria-label="Generla-Props">
           <SaveIcon />
         </IconButton>
         </Paper>
         <Divider />
+
+
         <Typography className={classes.headerPadding} variant="display2">
           Analysis
         </Typography>
@@ -299,8 +357,10 @@ class analytics extends Component {
         >
           {buttonSet}
         </Grid>
+
+
         <Paper className={classes.mainPaper}>
-          <div ref={this.setSaveInput}>
+          <div ref={this.setSaveUD}>
             <Typography className={classes.headerPadding} variant="headline">
               Up/Down Time
             </Typography>
@@ -310,12 +370,54 @@ class analytics extends Component {
               event_end_date_unix={this.state.event_end_date_unix}
             />
           </div>
-          <IconButton onClick={()=> this.onSaveHandler('AnalyticsUD')} size='small' className={classes.saveButton} aria-label="AnalyticsUD">
+          <IconButton onClick={()=> this.onSaveHandler('AnalyticsUD', this.UD)} size='small' className={classes.saveButton} aria-label="AnalyticsUD">
             <SaveIcon />
           </IconButton>
         </Paper>
-        <Paper>
-          <div ref={this.setSaveInput}>
+
+
+        <Paper className={classes.mainPaper}>
+          <div ref={this.setSaveDownCount}>
+            <Typography className={classes.headerPadding} variant="headline">
+              Down Time Count
+            </Typography>
+            {
+              this.props.moduleData.map(item => {
+                return(
+                  <BarChart 
+                    key={item.device_name}
+                    data={item.down_time_count_array}
+                    device_name={item.device_name}
+                  />
+                );
+              })
+            }
+          </div>
+          <Grid 
+            container 
+            direction='row-reverse'
+            justify='space-between'
+            alignItems='center'
+          >
+            <Grid item >
+              <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'Down Time Count', this.downCount)} size='small' aria-label="Down-Time-Count">
+                <SaveIcon />
+              </IconButton>
+            </Grid>
+            <Grid item >
+              <Button variant="outlined" color="primary" className={classes.tickButton} onClick={() => this.setTimeHandler('week')}>
+                Week
+              </Button>
+              <Button variant="outlined" color="primary" className={classes.tickButton} onClick={() => this.setTimeHandler('month')}>
+                Month
+              </Button>
+            </Grid>
+          </Grid>
+        </Paper>
+
+
+        <Paper className={classes.mainPaper}>
+          <div ref={this.setSaveLatency}>
             <Typography className={classes.headerPadding} variant={'headline'}>
               Latency
             </Typography>
@@ -325,10 +427,53 @@ class analytics extends Component {
               event_end_date_unix={this.state.event_end_date_unix}            
             />
           </div>
-          <IconButton onClick={()=> this.onSaveHandler('AnalyticsLat')} size='small' className={classes.saveButton} aria-label="AnalyticsLat">
+          <IconButton onClick={()=> this.onSaveHandler('AnalyticsLat', this.latency)} size='small' className={classes.saveButton} aria-label="AnalyticsLat">
             <SaveIcon />
           </IconButton>
         </Paper>
+
+
+        <Paper className={classes.mainPaper}>
+          <div ref={this.setSaveLatCount}>
+            <Typography className={classes.headerPadding} variant="headline">
+              RTA Count(Latency > 120ms)
+            </Typography>
+            {
+              this.props.moduleData.map(item => {
+                return(
+                  <BarChart 
+                    key={item.device_name}
+                    data={item.rta_count_array}
+                    device_name={item.device_name}
+                  />
+                );
+              })
+            }
+          </div>
+          <Grid 
+            container 
+            direction='row-reverse'
+            justify='space-between'
+            alignItems='center'
+          >
+            <Grid item >
+              <IconButton onClick={()=> this.onSaveHandler(this.props.id + 'Down Time Count', this.latCount)} size='small' aria-label="Down-Time-Count">
+                <SaveIcon />
+              </IconButton>
+            </Grid>
+            <Grid item >
+              <Button variant="outlined" color="primary" className={classes.tickButton} onClick={() => this.setTimeHandler('week')}>
+                Week
+              </Button>
+              <Button variant="outlined" color="primary" className={classes.tickButton} onClick={() => this.setTimeHandler('month')}>
+                Month
+              </Button>
+            </Grid>
+          </Grid>
+        </Paper>
+
+
+        {this.props.err && <Modal />}
       </div>
     );
   };
@@ -339,6 +484,7 @@ const mapStateToProps = state => {
     modules: state.network.modules,
     individualModule: state.network.individualModule,
     moduleData: state.analytics.moduleData,
+    err: state.network.err,
   };
 };
 
@@ -346,7 +492,8 @@ const mapDispatchToProps = dispatch => {
   return {
     addIndData: (data) => dispatch(addIndData(data)),
     remIndData: (data) => dispatch(remIndData(data)),
-    getStats: (data) => dispatch(getStats(data)),
+    getStats: (data, time) => dispatch(getStats(data, time)),
+    deviceCountInit: (data, time, device) => dispatch(deviceCountInit(data, time, device)),
   };
 };
 

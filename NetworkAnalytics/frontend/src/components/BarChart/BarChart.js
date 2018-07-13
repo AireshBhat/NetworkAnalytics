@@ -8,7 +8,8 @@ import {
   CartesianGrid, 
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
+  LabelList,
 } from 'recharts';
 
 class barChart extends Component {
@@ -21,7 +22,9 @@ class barChart extends Component {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey='count' fill='#8884d8'/>
+          <Bar name={this.props.device_name} dataKey='count' fill='#8884d8' isAnimationActive={false} stroke='#8884d8' opacity={0.8}>
+            <LabelList dataKey="count" position="insideBottom" />
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     );

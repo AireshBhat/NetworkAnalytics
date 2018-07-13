@@ -10,6 +10,8 @@ import Link from './components/Link/Link';
 import Dashboard from './containers/Dashboard/Dashboard';
 import Analytics from './containers/Analytics/Analytics';
 import UploadData from './containers/UploadData/UploadData';
+
+import Modal from './components/Modal/Modal';
 // import Typography from '@material-ui/core/Typography';
 
 import DashboardIcon from '@material-ui/icons/Dashboard';
@@ -84,7 +86,7 @@ class App extends Component {
           key={item.device_name} 
           to={`/dashboard/` + item.device_name}
           primary={item.device_name} 
-          secondary={item.device_region}
+          secondary={item.device_region + ' - ' + item.device_isp}
           icon={<ShowChartIcon />} 
           className="classes.nested" 
           id={item.device_name}
@@ -123,7 +125,8 @@ class App extends Component {
         <Route path="/dashboard/" component={Dashboard} />
         <Route path="/analytics/" component={Analytics} />
         <Route path="/uploadData/" component={UploadData} />
-    </main>
+      </main>
+      {this.props.err && <Modal />}
   </div>
     );
   }
@@ -135,6 +138,7 @@ const mapStateToProps = state => {
     modules: state.network.modules,
     individualModule: state.network.individualModule,
     moduleExist: state.network.moduleExist,
+    err: state.network.err,
   };
 };
 
