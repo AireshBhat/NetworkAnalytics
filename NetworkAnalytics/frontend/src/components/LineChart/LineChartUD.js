@@ -16,18 +16,6 @@ import moment from 'moment';
 import TooltipContent from '../Tooltip/Tooltip';
 import CustomizedDot from '../CustomizedDot/CustomizedDot';
 
-// const TooltipContent = (props) => {
-//   console.log("tooltip");
-//   console.log(props);
-//   return (
-//     <Paper>
-//       <Typography variant="subheading">
-//         Date: {moment.unix(props.label).format('DD-MM, HH:mm')}
-//       </Typography>
-//     </Paper>
-//   );
-// };
-
 class lineChart extends Component {
   componentDidMount() {
   };
@@ -92,6 +80,7 @@ class lineChart extends Component {
               type='step'
               stroke="url(#splitColor)"
               fill="url(#splitColor)"
+              activeDot
             >
               <LabelList content={(data) => <CustomizedDot data={data}/> } />
             </Area>

@@ -5,18 +5,8 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-import SearchIcon from '@material-ui/icons/Search';
 import IconButton from '@material-ui/core/IconButton';
 import LogoutIcon from '@material-ui/icons/ExitToApp';
-// import TextField from '@material-ui/core/TextField'
-// import SearchIcon from '@material-ui/icons/Search';
-// import Paper from '@material-ui/core/Paper';
-// import MenuItem from '@material-ui/core/MenuItem';
-// import Autosuggest from 'react-autosuggest';
-// import match from 'autosuggest-highlight/match';
-// import parse from 'autosuggest-highlight/parse';
-
-import PropTypes from 'prop-types';
 
 import AutoSuggest from '../AutoSuggest/AutoSuggest';
 
@@ -58,15 +48,12 @@ const appBar = props => {
           </Grid>
           <Grid item >
             <Grid container justify='space-between' direction='row' alignItems='center'>
-              <Grid item >
-                  <SearchIcon className={classes.button}/>
-                </Grid>
                 <Grid item >
                   <AutoSuggest className={classes.autoSuggest}/>
                 </Grid>
               
               <Grid item >
-                <a href="nalvp.pythonanywhere.com/logout/">
+                <a href="http://nalvp.pythonanywhere.com/logout/">
                   <IconButton className={classes.button} disabled aria-label="Search">
                     <LogoutIcon />
                 </IconButton>

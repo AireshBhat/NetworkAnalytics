@@ -10,9 +10,6 @@ const styles = theme => ({
 });
 
 const customizedDot = props => {
-  // console.log("Data");
-  // console.log(props.data);
-  // console.log(props);
   const { classes } = props;
   return (
     <div className={classes.customizedDot}>
@@ -34,6 +31,3 @@ const customizedDot = props => {
 };
 
 export default withStyles(styles)(customizedDot);
-
-          // {props.data.value === 1 ? '' : 'Date: ' + moment.unix(props.data.payload.event_start_time).format('dddd, MMMM Do YYYY, h:mm:ss a')}
-

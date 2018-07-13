@@ -65,7 +65,7 @@ class lineChart extends Component {
             type='monotone'
             stroke="#000"
             isAnimationActive={false}
-            dot={this.renderLabel}
+            activeDot
           />
         </LineChart>
       </ResponsiveContainer>

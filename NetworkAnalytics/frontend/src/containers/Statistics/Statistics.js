@@ -217,6 +217,8 @@ class statistics extends Component {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF({
           orientation: 'landscape',
+          unit: 'pt',
+          format: [target.clientWidth * 0.8, target.clientHeight * 0.8]
         });
         pdf.addImage(imgData, 'JPEG', 0, 0);
         pdf.save(data+'.pdf');
@@ -232,7 +234,9 @@ class statistics extends Component {
     });
     this.props.deviceCountInit({
       down_start_time: this.props.itemData.ud_down_start_time,
+      down_end_time: this.props.itemData.ud_down_end_time,
       rta_start_time: this.props.itemData.rta_start_time,
+      rta_end_time: this.props.itemData.rta_end_time,
     }, time, {
       device_name: this.props.id,
       start_date: this.state.event_start_date,
@@ -249,10 +253,13 @@ class statistics extends Component {
     // console.log("ind module");
     return (
       <div className={classes.root}>
-        <Grid container spacing={24}>
+        <Grid container alignItems='center' spacing={24}>
           <Grid item xs={10}>
             <Typography variant="display3">
               {this.props.id}
+            </Typography>
+            <Typography variant='body2'>
+              {this.props.itemData.device_region + ' - ' + this.props.itemData.device_isp}
             </Typography>
           </Grid>
           { this.props.token &&
@@ -377,6 +384,9 @@ class statistics extends Component {
               data={this.props.itemData.down_time_count_array}
               device_name={this.props.id}
             />
+            <Typography variant='subheading' className={classes.headerPadding}>
+              {'Total Time: ' + this.props.itemData.total_time_ud}
+            </Typography>
           </div>
           <Grid 
             container 
@@ -446,6 +456,9 @@ class statistics extends Component {
               data={this.props.itemData.rta_count_array}
               device_name={this.props.id}
             />
+            <Typography variant='subheading' className={classes.headerPadding}>
+              {'Total Time: ' + this.props.itemData.total_time_rta}
+            </Typography>
           </div>
           <Grid 
             container 

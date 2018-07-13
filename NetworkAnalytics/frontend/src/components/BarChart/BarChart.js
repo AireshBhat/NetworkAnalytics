@@ -22,8 +22,8 @@ class barChart extends Component {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar name={this.props.device_name} dataKey='count' fill='#8884d8' isAnimationActive={false} stroke='#8884d8' opacity={0.8}>
-            <LabelList dataKey="count" position="insideBottom" />
+          <Bar name={this.props.device_name} dataKey='count' fill='#8884d8' isAnimationActive={false} stroke='#8884d8' opacity={0.8} label >
+            <LabelList dataKey="timeCount" position="top" />
           </Bar>
         </BarChart>
       </ResponsiveContainer>

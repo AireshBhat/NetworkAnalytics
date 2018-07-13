@@ -8,24 +8,35 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Tooltip,
+  LabelList,
 } from 'recharts';
 
 class radarChart extends Component{
 	render () {
   	return (
       <RadarChart 
-        outerRadius={75} 
+        outerRadius={100} 
         width={400} 
-        height={300} 
+        height={400} 
         data={this.props.data}
         margin={ {top: 50, bottom: 50,} }
       >
           <PolarGrid />
-          <PolarAngleAxis dataKey="name" />
+          <PolarAngleAxis dataKey="name" radius='200%' />
           <PolarRadiusAxis/>
-          <Legend />
+          <Legend margin={{right: 80, left: 80, top: 80, bottom: 80}}/>
           <Tooltip />
-          <Radar name="Up Time Comparison" dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6}/>
+          <Radar 
+            name={this.props.name} 
+            dataKey="value"
+            stroke="#8884d8"
+            fill="#8884d8" 
+            fillOpacity={0.6}
+            legendType={'square'}
+            isAnimationActive={false}
+          >
+            <LabelList dataKey="value" position='insideStart' angle="0"/>
+          </Radar>
         </RadarChart>
     );
   }
