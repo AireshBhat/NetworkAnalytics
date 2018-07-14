@@ -92,8 +92,8 @@ export const updateStatsAnal = (data, deviceName) => {
 export const uploadModule = (formData, indMod, push, path) => {
     return dispatch => {
         dispatch(setLoader(true));
-        const url_fetch = 'http://nalvp.pythonanywhere.com/uploadData/';
-        // const url_fetch = 'http://127.0.0.1:8000/uploadData/';
+        // const url_fetch = 'http://nalvp.pythonanywhere.com/uploadData/';
+        const url_fetch = 'http://172.16.154.26:8000/uploadData/';
         const userName = 'nalvp';
         const ticket = 'na@lvpei';
         fetch(url_fetch, {
@@ -136,8 +136,8 @@ export const getModules = (indMod) => {
     return dispatch => {
         dispatch(setLoader(true));
         dispatch(getLogin());
-        const url_fetch = 'http://nalvp.pythonanywhere.com/devices/';
-        // const url_fetch = 'http://127.0.0.1:8000/devices/';
+        // const url_fetch = 'http://nalvp.pythonanywhere.com/devices/';
+        const url_fetch = 'http://172.16.154.26:8000/devices/';
         fetch(url_fetch, {
             method: 'GET',
         })
@@ -195,8 +195,8 @@ export const getModules = (indMod) => {
 
 export const getIndividualAnal = (data, moduleData) => {
     return dispatch => {
-        const url_fetch = 'http://nalvp.pythonanywhere.com/individualAnalytics/';
-        // const url_fetch = 'http://127.0.0.1:8000/individualAnalytics/';
+        // const url_fetch = 'http://nalvp.pythonanywhere.com/individualAnalytics/';
+        const url_fetch = 'http://172.16.154.26:8000/individualAnalytics/';
         fetch(url_fetch, {
             method: 'POST',
             body: JSON.stringify(data),
@@ -246,7 +246,8 @@ export const getIndividualAnal = (data, moduleData) => {
 export const getStats = (device, time) => {
     // console.log('device', device);
     return dispatch => {
-        const url_fetch = 'http://nalvp.pythonanywhere.com/deviceStats/';
+        // const url_fetch = 'http://nalvp.pythonanywhere.com/deviceStats/';
+        const url_fetch = 'http://172.16.154.26:8000/deviceStats';
         fetch(url_fetch, {
             method: 'POST',
             body: JSON.stringify(device),
@@ -466,7 +467,8 @@ const timeFormatter = (difference) => {
 
 export const getLogin = () => {
     return dispatch => {
-        const url_fetch = 'http://nalvp.pythonanywhere.com/isAllowed/';
+        // const url_fetch = 'http://nalvp.pythonanywhere.com/isAllowed/';
+        const url_fetch = 'http://172.16.154.26:8000/isAllowed';
         fetch(url_fetch, {
             method: 'GET',
         })

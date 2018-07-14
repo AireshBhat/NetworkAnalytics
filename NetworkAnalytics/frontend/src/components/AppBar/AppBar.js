@@ -53,7 +53,7 @@ const appBar = props => {
                 </Grid>
               
               <Grid item >
-                <a href="http://nalvp.pythonanywhere.com/logout/">
+                <a href="http://172.16.154.26:8000/logout/">
                   <IconButton className={classes.button} disabled aria-label="Search">
                     <LogoutIcon />
                 </IconButton>
