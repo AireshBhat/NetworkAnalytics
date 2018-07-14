@@ -19,7 +19,7 @@ class barChart extends Component {
         <BarChart data={this.props.data}>
           <CartesianGrid strokeDasharray={'3 3'}/>
           <XAxis dataKey="time"/>
-          <YAxis />
+          <YAxis padding={{ top: 30}}/>
           <Tooltip />
           <Legend />
           <Bar name={this.props.device_name} dataKey='count' fill='#8884d8' isAnimationActive={false} stroke='#8884d8' opacity={0.8} label >
