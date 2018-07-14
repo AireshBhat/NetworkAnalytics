@@ -15,9 +15,9 @@ class radarChart extends Component{
 	render () {
   	return (
       <RadarChart 
-        outerRadius={100} 
-        width={400} 
-        height={400} 
+        outerRadius={125} 
+        width={500} 
+        height={500} 
         data={this.props.data}
         margin={ {top: 50, bottom: 50,} }
       >

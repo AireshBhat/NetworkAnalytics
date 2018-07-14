@@ -102,6 +102,9 @@ class analytics extends Component {
     this.setSaveLatCount = element => {
       this.latCount = element;
     };
+    this.setSaveProperties = element => {
+      this.properties = element;
+    }
   };
 
   clickHandler = (data) => {
@@ -333,51 +336,56 @@ class analytics extends Component {
           </Grid>
           <Paper className={classes.mainPaper}>
           
-            <div ref={this.setSaveGenProps}>
-              <Typography className={classes.subheaderPadding} variant='headline'> UP/DOWN </Typography>
-              <Grid
-                container
-                className={classes.root}
-                alignItems='center'
-                justify='center'
-                direction='row'
-              >
-                {piSet}
-              </Grid>
+              <div ref={this.setSaveGenProps}>
+                <Typography className={classes.subheaderPadding} variant='headline'> UP/DOWN </Typography>
+                <Grid
+                  container
+                  className={classes.root}
+                  alignItems='center'
+                  justify='center'
+                  direction='row'
+                >
+                  {piSet}
+                </Grid>
+              </div>
+              <IconButton onClick={()=> this.onSaveHandler('GeneralProps', this.genProps)} size='small' className={classes.saveButton} aria-label="Generla-Props">
+                <SaveIcon />
+              </IconButton>
               <Divider />
-            <Grid
-              container
-              className={classes.root}
-              alignItems='center'
-              justify='center'
-              direction='row'
-            >
+              <div ref={this.setSaveProperties}>
+                <Grid
+                  container
+                  className={classes.root}
+                  alignItems='center'
+                  justify='center'
+                  direction='row'
+                >
               <Grid item >
                 <RadarChart 
                   data={
-                  this.props.moduleData.map(item => {
-                    return {
-                      name: item.device_name,
-                      value: Math.round(item.average_down_time * 10000)/100 ,
-                    };
-                  })
-                  }
-                  name="Down Time Percentage"
-                />
-              </Grid>
+                    this.props.moduleData.map(item => {
+                      return {
+                        name: item.device_name,
+                        value: Math.round(item.average_down_time * 10000)/100 ,
+                      };
+                    })
+                    }
+                    name="Down Time Percentage"
+                  />
+                </Grid>
               <Grid item >
                 <RadarChart 
                   data={
-                  this.props.moduleData.map(item => {
-                    return {
-                      name: item.device_name,
-                      value: Math.round(item.average_packet_loss * 100)/100 ,
-                    };
-                  })
-                  }
-                  name="Packet Loss Percentage"
-                />
-              </Grid>
+                    this.props.moduleData.map(item => {
+                      return {
+                        name: item.device_name,
+                        value: Math.round(item.average_packet_loss * 100)/100 ,
+                      };
+                    })
+                    }
+                    name="Packet Loss Percentage"
+                  />
+                </Grid>
               <Grid item >
                 <RadarChart data={
                   this.props.moduleData.map(item => {
@@ -386,9 +394,9 @@ class analytics extends Component {
                       value: item.down_time_count,
                     };
                   })
-                } 
-                name="Down Time Count"
-              />
+                  } 
+                  name="Down Time Count"
+                />
               </Grid>
               <Grid item >
                 <RadarChart data={
@@ -398,13 +406,13 @@ class analytics extends Component {
                       value: item.rta_count,
                     };
                   })
-                } 
-                name="RTA Count"
-              />
+                  } 
+                  name="RTA Count"
+                />
               </Grid>
             </Grid>
-        </div>
-        <IconButton onClick={()=> this.onSaveHandler('GeneralProps', this.genProps)} size='small' className={classes.saveButton} aria-label="Generla-Props">
+          </div>
+        <IconButton onClick={()=> this.onSaveHandler('GeneralProps', this.properties)} size='small' className={classes.saveButton} aria-label="Generla-Props">
           <SaveIcon />
         </IconButton>
         </Paper>
