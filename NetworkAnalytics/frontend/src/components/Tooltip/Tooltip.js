@@ -14,6 +14,7 @@ const styles = theme => ({
 
 const toolTip = props => {
   const { classes } = props;
+  console.log(props.data);
   return (
     <Paper className={classes.toolTip}>
       {
@@ -37,7 +38,15 @@ const toolTip = props => {
           </Typography>
       }
       <Typography variant="subheading">
-        Date: {moment.unix(props.data.label).format('dddd, MMMM Do YYYY, h:mm:ss a')}
+        Date: {moment.unix(props.data.label).format('dddd, MMMM Do YYYY, h:mm:ss a') + ' - ' + (
+          moment.unix(props.data.label ? 
+            ( props.data.payload[0] ? 
+              props.data.payload[0].payload.event_end_time :
+              'Not applicable'
+            ) 
+            : 
+            'Not Applicable').format('dddd, MMMM Do YYYY, h:mm:ss a')
+        )}
       </Typography>
     </Paper>
   );

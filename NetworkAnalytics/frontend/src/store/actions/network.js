@@ -105,7 +105,7 @@ export const uploadModule = (formData, indMod, push, path) => {
         })
             .catch(err => {
                 console.log(err);
-                dispatch(setError(true, err));
+                dispatch(setLoader(false));
             })
             .then(res => {
                 // console.log("I have been recieved");
@@ -121,6 +121,12 @@ export const uploadModule = (formData, indMod, push, path) => {
                 dispatch(getModules(indMod));
                 dispatch(setLoader(false));
                 push(path);
+            })
+            .catch(err => {
+                Promise.resolve(err);
+                console.log(err);
+                dispatch(setError(true, '500'));
+                dispatch(setLoader(false));
             })
     };
 };

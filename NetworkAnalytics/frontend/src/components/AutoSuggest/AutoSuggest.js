@@ -127,7 +127,6 @@ class autoSuggest extends Component {
           <div>
             <Typography variant='subheading'>
               {parts.map((part, index) => {
-                console.log('suggestion', suggestion);
                 return part.highlight ? (
                   <span key={String(index)} style={{ fontWeight: 500 }}>
                     {part.text}
