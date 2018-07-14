@@ -475,7 +475,8 @@ export const getLogin = () => {
                 return res.json();
             })
             .then(parsedRes => {
-                // console.log('parsedRes', parsedRes);
+                console.log('parsedRes', parsedRes);
+                console.log(parsedRes.is_allowed);
                 dispatch(setLogin(parsedRes.is_allowed));
             })
             .catch( err => 

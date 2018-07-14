@@ -104,7 +104,7 @@ const reducer = (state = initialState, action) => {
                 token: action.token,
             };
         default: 
-            return state;
+            return {...state };
     }
 };
 
