@@ -16,13 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from graphene_django.views import GraphQLView
+# from graphene_django.views import GraphQLView
+handler404 = 'analytics.views.handler404_not_found'
+handler500 = 'analytics.views.handler404_not_found'
 
 urlpatterns = [
     path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
     path('jet/', include('jet.urls', 'jet')),
     path('rxukDcskAnhJMZN2nvuJSqajtcAh9Yd0XD9KmpWmt5rlMmF6xNbCEyktm6aXho2T/admin/', admin.site.urls),
-    path('graphql', GraphQLView.as_view(graphiql=True)),
+    # path('graphql', GraphQLView.as_view(graphiql=True)),
     path('zmyJkfZSpDBU8FL0iWZ9HkWpvoraWG9eFSfZd0g0JMvpD1IUxt6AwJfaRclVyg8O/authentication/',
          include('authentication.urls')),
     path('', include('analytics.urls')),

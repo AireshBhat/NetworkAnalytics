@@ -7,7 +7,7 @@ class DataUpload(models.Model):
     upload_file = models.FileField(upload_to=settings.STATIC_URL[1:])
 
     def __str__(self):
-        return self.upload_file
+        return self.upload_file.name
 
 
 class Device(models.Model):
