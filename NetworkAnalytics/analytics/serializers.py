@@ -42,6 +42,22 @@ class DeviceParametersSerializer(serializers.ModelSerializer):
         pass
 
 
+# class ParametersSerializer(serializer.Serializer):
+#     device_name = serailziers.CharField()
+#     device_region = serializers.CharField()
+#     device_type = serializers.CharField()
+#     device_isp = serializers.CharField()
+#     event_start_time = serializers.IntegerField()
+#     event_end_time = serializers.IntegerField()
+#     event_duration = serializers.IntegerField()
+#     device_state = serializers.CharField()
+#     device_state_type = serializers.CharField()
+#     device_ping = serializers.CharField()
+#     device_packet_loss = serializers.IntegerField()
+#     device_rta = serializers.FloatField()
+#     device_checkout_time = serializers.FloatField()
+
+
 class DeviceListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Device

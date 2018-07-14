@@ -45,7 +45,7 @@ INSTALLED_APPS = [
 
 INSTALLED_APPS += [
     'rest_framework',
-    'graphene_django',
+    # 'graphene_django',
     'webpack_loader',
 ]
 
@@ -167,6 +167,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 LOGIN_URL = 'zmyJkfZSpDBU8FL0iWZ9HkWpvoraWG9eFSfZd0g0JMvpD1IUxt6AwJfaRclVyg8O/authentication/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+handler404 = 'analytics.views.handler404'
 
 JET_DEFAULT_THEME = 'default'
 JET_SIDE_MENU_COMPACT = False
