@@ -262,7 +262,7 @@ class statistics extends Component {
               {this.props.itemData.device_region + ' - ' + this.props.itemData.device_isp}
             </Typography>
           </Grid>
-          { this.props.token &&
+          { true &&
             <Grid item xs={2}>
               <Tooltip id="tooltip-icon" title="Delete Module">
                 <IconButton onClick={this.openDialogueHandler} className={classNames(classes.button, classes.date)} aria-label="Close">
