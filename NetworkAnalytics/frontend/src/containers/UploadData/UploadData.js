@@ -53,11 +53,7 @@ class uploadData extends Component {
 
   onDrop = (files) => {
     let res = files[0].name.split('_');
-    if(!(
-      this.props.modules.find(mod => {
-        return res[0] === mod.device_name;
-      })
-    ))
+    if(true)
     {
       this.setState({
         files
